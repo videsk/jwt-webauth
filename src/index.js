@@ -11,7 +11,7 @@
 
 import jwt_decode from 'jwt-decode';
 
-const WebAuth = class {
+class WebAuth {
     constructor({ key, jwt, debug, remember }) {
         this.token = jwt; // JWT Token
         this.payload = null; // Payload of token
