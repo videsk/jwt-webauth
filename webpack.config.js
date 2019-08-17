@@ -7,6 +7,7 @@ module.exports = {
         path: path.resolve(__dirname, 'build'),
         filename: 'web-auth.bundle.js',
         library: 'WebAuth',
+        libraryTarget: 'umd'
     },
     module: {
         rules: [
