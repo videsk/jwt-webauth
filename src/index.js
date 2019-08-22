@@ -20,39 +20,44 @@ class WebAuth {
         this.remember = remember || false; // By default is false
     }
 
-    init(callback) {
-        // Check if exist key in localStorage or sessionStorage
-        const cToken = window[this.checkStorage()].getItem(this.key);
-        // Save storage token or new token
-        this.token = this.token || cToken;
-        // Refresh or add token
-        this.setup(result => {
-            if (result) throw new Error('Token cannot be empty'); // Return error if the token isn't set
-            else{
-                // Set payload of JWT
-                this.setPayload();
-                // Check the expiration of JWT
-                this.checkExpiration(result => {
-                    if (result && typeof callback === 'function') callback({ valid: true, token: this.token, payload: this.payload }); // Return valid JWT
-                    else if(typeof callback === 'function') callback({ valid: false, token: this.token, payload: this.payload }); // Return invalid JWT
-                    else this.Debug('info', { valid: false, token: this.token, payload: this.payload }); // Return debug
+    init() {
+        return new Promise((resolve, reject) => {
+            // Check if exist key in localStorage or sessionStorage
+            const cToken = window[this.checkStorage()].getItem(this.key);
+            // Save storage token or new token
+            this.token = this.token || cToken;
+            // Refresh or add token
+            this.setup()
+                .then(() => {
+                        // Set payload of JWT
+                        this.setPayload();
+                        // Check the expiration of JWT
+                        this.checkExpiration(valid => {
+                            const obj = { valid, token: this.token, payload: this.payload };
+                            if (valid) resolve(obj); // Return valid JWT
+                            else this.Debug('warn', obj); // Return debug
+                        });
+                })
+                .catch(e => {
+                    this.cleanTokens();
+                    reject(e);
                 });
-            }
         });
     }
 
-    setup(callback) {
-        // Default value for response on callback
-        let response = false;
-        // Save JWT in dynamic route
-        const route = (this.remember) ? 'localStorage' : 'sessionStorage';
-        // Remove all others JWT storage
-        this.cleanTokens();
-        // Refresh or save in dynamic route
-        if (this.token) window[route].setItem(this.key, this.token);
-        else response = true;
-        // Execute callback
-        if (typeof callback === 'function') callback(response);
+    setup() {
+        return new Promise((resolve, reject) => {
+            // Save JWT in dynamic route
+            const route = (this.remember) ? 'localStorage' : 'sessionStorage';
+            // Remove all others JWT storage
+            this.cleanTokens();
+            // Refresh or save in dynamic route
+            if (!this.token) reject('Token is not defined');
+            else {
+                window[route].setItem(this.key, this.token);
+                resolve();
+            }
+        });
     }
 
     checkExpiration(callback) {
