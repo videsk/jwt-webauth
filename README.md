@@ -3,7 +3,7 @@
  
  This library allows you do easy way to manage JWT in localStorage or sessionStorage.
  
- ## How to use
+## How to use
  For start you need instance `WebAuth` class.
 
 ```js

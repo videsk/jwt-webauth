@@ -4,10 +4,7 @@
     <list default="true" id="21f971f0-8410-49f2-89cd-c5ed27af6f0b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -77,7 +74,7 @@
       <workItem from="1565986618538" duration="4340000" />
       <workItem from="1566190846368" duration="3869000" />
       <workItem from="1566431508955" duration="1173000" />
-      <workItem from="1566434601785" duration="8026000" />
+      <workItem from="1566434601785" duration="8311000" />
     </task>
     <task id="LOCAL-00001" summary="FIX:Fixed the index file">
       <created>1566190932173</created>
@@ -107,7 +104,21 @@
       <option name="project" value="LOCAL" />
       <updated>1566434763702</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="NEW:Added pathname, hash, readme and future JWT HTTP check">
+      <created>1566449085267</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1566449085267</updated>
+    </task>
+    <task id="LOCAL-00006" summary="FIX:Builded">
+      <created>1566449139265</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1566449139265</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,7 +150,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="FIX:Fixed the index file" />
     <MESSAGE value="FIX:Update with promises" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX:Update with promises" />
+    <MESSAGE value="NEW:Added pathname, hash, readme and future JWT HTTP check" />
+    <MESSAGE value="FIX:Builded" />
+    <option name="LAST_COMMIT_MESSAGE" value="FIX:Builded" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
