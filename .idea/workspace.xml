@@ -69,7 +69,7 @@
       <workItem from="1565909987779" duration="47000" />
       <workItem from="1565986618538" duration="4340000" />
       <workItem from="1566190846368" duration="3869000" />
-      <workItem from="1566431508955" duration="1094000" />
+      <workItem from="1566431508955" duration="1173000" />
     </task>
     <task id="LOCAL-00001" summary="FIX:Fixed the index file">
       <created>1566190932173</created>
@@ -85,7 +85,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566432560622</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="FIX:Update with promises">
+      <created>1566432628902</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1566432628902</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
