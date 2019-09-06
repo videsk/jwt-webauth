@@ -4,7 +4,10 @@
     <list default="true" id="21f971f0-8410-49f2-89cd-c5ed27af6f0b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,7 +27,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JavaScript" />
     <property name="javascript.nodejs.core.library.configured.version" value="12.8.1" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../webrtc-ui" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -74,7 +77,12 @@
       <workItem from="1565986618538" duration="4340000" />
       <workItem from="1566190846368" duration="3869000" />
       <workItem from="1566431508955" duration="1173000" />
-      <workItem from="1566434601785" duration="8311000" />
+      <workItem from="1566434601785" duration="11699000" />
+      <workItem from="1566848340992" duration="13590000" />
+      <workItem from="1567263934237" duration="11333000" />
+      <workItem from="1567385036711" duration="3548000" />
+      <workItem from="1567715033796" duration="2541000" />
+      <workItem from="1567811112893" duration="10000" />
     </task>
     <task id="LOCAL-00001" summary="FIX:Fixed the index file">
       <created>1566190932173</created>
@@ -118,7 +126,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566449139265</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="FIX:Builded">
+      <created>1566449310680</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1566449310680</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
