@@ -14,55 +14,49 @@ import jwt_decode from 'jwt-decode';
 
 class WebAuth {
 
-    constructor({ key, tokens, debug, remember, config, expired }) {
+    constructor({ keys, tokens, remember, config, expired }) {
         this.tokens = {
             access: (tokens && 'access' in tokens) ? tokens.access : null, // Set access token
             refresh: (tokens && 'refresh' in tokens) ? tokens.refresh : null // Set refresh token
         };
         this.payloads = { access: null, refresh: null }; // Payload of access and refresh token
         this.keys = {
-            access: (key && 'access' in key) ? key.access : 'auth-key', // Key of access token for save in local or session storage
-            refresh: (key && 'refresh' in key) ? key.refresh : 'auth-key-refresh' // Key of refresh token for save in local or session storage
+            access: (keys && 'access' in keys) ? keys.access : 'auth-key', // Key of access token for save in local or session storage
+            refresh: (keys && 'refresh' in keys) ? keys.refresh : 'auth-key-refresh' // Key of refresh token for save in local or session storage
         };
-        this.debug = (typeof debug === 'boolean') ? debug : false; // By default is false
+        this.debug = ('debug' in config && typeof config.debug === 'boolean') ? config.debug : false; // By default is false
         this.remember = (typeof remember === 'boolean') ? remember : false; // By default is false
         this.config = (typeof config === 'object') ? config : null; // Parameters for validate and get new token
-        this.expired = (typeof expired === 'function') ? expired : null; // Handler for positive or negative result of validation
-        this.interval = null;
+        this.expired = (typeof expired === 'function') ? expired : () => {}; // Handler for positive or negative result of validation
+        this.interval = { execute: null, try: 0 };
     }
 
     init() {
         return new Promise((resolve, reject) => {
             // Save access token
-            this.token = this.token || this.getFromStorage(this.keys.access);
+            this.tokens.access = this.tokens.access || this.getFromStorage(this.keys.access);
             // Save refresh token
-            this.refresh = this.refresh || this.getFromStorage(this.keys.refresh);
+            this.tokens.refresh = this.tokens.refresh || this.getFromStorage(this.keys.refresh);
             // Refresh or add token
             this.setup()
                 .then(() => {
-                        // Set payload of access token
-                        this.setPayload('access');
-                        // Set payload of refresh token
-                        if (this.tokens.access) this.setPayload('refresh');
-                        /*
-                        **  Here check the access token
-                        **  if is expired try to use refresh token for get a new
-                        **  in other case reject and execute return catch
-                         */
-                        this.checkExpiration('access',valid => {
-                            // Get parameters
-                            const pathnameObject = { pathname: Object.assign(this.getSearchOrHash(), this.nestedPathname()) };
-                            // base obj
-                            const finalObj = { valid, tokens: this.tokens, payloads: this.payloads };
-                            // merge two obj
-                            Object.assign(finalObj, pathnameObject);
-                            // Add checker for expiration time of JWT
-                            this.createChecker();
-                            // Check in backend
-                            this.checkHTTP()
-                                .then(() => resolve(finalObj)) // Return valid JWT
-                                .catch(() => reject(finalObj));
-                        });
+                    this.checkExpiration('access',valid => {
+                        // Get parameters
+                        const pathnameObject = { pathname: Object.assign(this.getSearchOrHash(), this.nestedPathname()) };
+                        // base object
+                        const finalObj = { valid, tokens: this.tokens, payloads: this.payloads };
+                        // merge two obj
+                        Object.assign(finalObj, pathnameObject);
+                        // Set in constant the endpoint validate access token
+                        const endpoint = (this.validateURL()) && this.config.url['endpoints'].validate;
+                        // Check in backend
+                        this.checkHTTP({ endpoint })
+                            .then((result) => resolve(finalObj))
+                            .catch((status) => {
+                                if (status === 403 && 'refresh' in this.tokens) this.getNewToken()
+                                    .then(() => resolve());
+                            });
+                    });
                 })
                 .catch(e => {
                     this.cleanTokens();
@@ -84,6 +78,17 @@ class WebAuth {
                 window[route].setItem(this.keys.access, this.tokens.access);
                 // Save refresh token
                 if (this.tokens.refresh) window[route].setItem(this.keys.refresh, this.tokens.refresh);
+                // Set payload of access token
+                this.setPayload('access');
+                // Set payload of refresh token
+                if (this.tokens.access) this.setPayload('refresh');
+                /*
+                **  Here check the access token
+                **  if is expired try to use refresh token for get a new
+                **  in other case reject and execute return catch
+                */
+                // Add checker for expiration time of JWT
+                this.createChecker();
                 // Finish
                 resolve();
             }
@@ -96,14 +101,17 @@ class WebAuth {
         // Get local time of user
         const today = new Date().getTime();
         // Check if the expiration date is greater of today
-        if (expiration >= today) callback(true); else callback(false);
+        const valid = expiration >= today;
+        // Return value in callback or directly
+        if (typeof callback === 'function') callback(valid);
+        else return valid;
     }
 
     setPayload(token) {
         // Error if payload isn't a object
         const error = () => {
             this.Debug('error', { token: this.tokens[token], payload: this.payloads[token] });
-            this.Debug('error', new Error('Payload isn\'t an object'));
+            this.Debug('error', new Error('[Auth Web] Payload isn\'t an object'));
             return {};
         };
         // Decode JWT and get-set payload
@@ -124,11 +132,11 @@ class WebAuth {
 
     cleanTokens() {
         // Remove from localStorage
-        window.localStorage.removeItem(this.key);
-        window.localStorage.removeItem(this.refreshKey);
+        window.localStorage.removeItem(this.keys.access);
+        window.localStorage.removeItem(this.keys.refresh);
         // Remove from sessionStorage
-        window.sessionStorage.removeItem(this.key);
-        window.sessionStorage.removeItem(this.refreshKey);
+        window.sessionStorage.removeItem(this.keys.access);
+        window.sessionStorage.removeItem(this.keys.refresh);
     }
 
     getPathname() {
@@ -182,57 +190,110 @@ class WebAuth {
         return (search) ? formatter(search) : formatter(hash);
     }
 
-    // Working for the next version 1.2.0
-    checkHTTP(urlKey = 'check') {
+    checkHTTP({ endpoint, token = 'access' }) {
         return new Promise((resolve, reject) => {
-            if (this.config
-                && typeof this.config === 'object' // Validate is object
-                && 'url' in this.config
-                && typeof this.config.url === 'object') {
+            // Validate all mandatory keys exists
+            if (this.validateURL()) {
                 // Create a new header
                 const header = new Headers();
                 // Destructing object and get keys
-                const { headers, url, prefix, method, body } = this.config;
+                const { headers, url, prefix, methods, bodies } = this.config;
                 // Map checker object only if exist
-                if (headers) Object.keys(headers).map(key => {
+                if (headers[token]) Object.keys(headers).map(key => {
                     // Key to lower case
                     const foo = key.toLowerCase();
                     // check the key is not reserved
                     if (foo !== 'authorization') header.append(key, headers[key]);
                 });
-                // Add to header object
-                header.append('Authorization', `${prefix || 'Bearer'} ${this.token}`);
+                // Add to header objects
+                header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens[token]}`);
                 // fetch to url
-                fetch(url[urlKey], { method: method || 'POST', header, body: body || {} })
+                fetch(`${url.base}/${endpoint}`, { method: methods[token] || 'POST', header, body: bodies[token] || {} })
                     .then(response => {
                         // Return response
-                        resolve(response);
+                        this.parse(response)
+                            .then((r) => resolve(r));
                     })
-                    .catch(e => reject(e)); // Reject is not valid or something happen with server/url
+                    .catch((response) => {
+                        this.parse(response).then((x, status) => reject(status));
+                    }); // Reject, is not valid or something happen with server/url
             } else {
                 // Check if checker is declared like object or not backend validation
                 if (typeof this.config === 'undefined') resolve(); // Not backend validation is required
-                else reject('Config dont\'t have the correct format or url key not found.'); // Some declarations are not correct
+                else reject('[Auth Web] Config dont\'t have the correct format or url key not found.'); // Some declarations are not correct
             }
         });
     }
 
     getNewToken() {
-        // Get new token if the access token expired
+        return new Promise((resolve, reject) => {
+            if (this.validateURL() && 'refresh' in this.tokens) {
+                // Get endpoint of refresh token
+                const {endpoints, keys} = this.config.url;
+                // Get new token if the access token expired
+                this.checkHTTP({ endpoint: endpoints.access, token: 'refresh' })
+                    .then((response) => {
+                        // Set new access token
+                        this.tokens.access = response[keys.access];
+                        // Setup the new token in storage
+                        this.setup()
+                            .then(() => resolve())
+                            .catch(() => reject());
+                    })
+                    .catch((status) => reject(status));
+            } else reject(this.Debug('error', '[Auth Web] Trying to get a access token without mandatory keys.'));
+        });
     }
 
-    createChecker(token) {
+    createChecker() {
+        /* This function try to get new access token
+        * with the refresh token, if is exist refresh token
+        * All expires if server return error 403
+         */
+
         // Handler of JWT expiration
         const handler = () => {
-            if (new Date().getTime() > this.payloads[token].exp*1000) {
+            if (!this.checkExpiration('access') && this.interval.try <= 5) {
                 // Clear interval
-                clearInterval(this.interval);
-                // Execute custom expired function
-                this.expired();
+                clearInterval(this.interval.execute);
+                // First try to get a new access token with the refresh token
+                if (this.validateURL()
+                    && 'refresh' in this.tokens) this.getNewToken()
+                    // If the response is with 403 Forbidden execute expired function
+                    // Else maybe the server have a bad day and need create the checker again
+                    .catch((status) => (status === 403) ? this.expire() : this.createChecker(this.interval.try++));
+                // If you don't have refresh token implementation only expire token
+                else this.expire();
             }
+            // If the server die or something goes wrong, try recursive but with 5 seconds of delay
+            else if (this.interval.try > 5) setTimeout(() => this.createChecker(this.interval.try = 0), 5000);
         };
         // Create interval
-        this.interval = window.setInterval(handler, 1000);
+        this.interval.execute = window.setInterval(handler, 1000);
+    }
+
+    validateURL() {
+        // Validate exist all keys and types of keys are correct
+        return (typeof this.config === 'object'
+            && 'url' in this.config
+            && typeof this.config.url === 'object'
+            && 'endpoints' in this.config.url
+            && typeof this.config.url['endpoints'] === 'object'
+            && 'access' in this.config.url['endpoints']);
+    }
+
+    parse(response) {
+        // Parse fetch
+        return new Promise((resolve, reject) => {
+           response.json()
+               .then((r) => resolve(r, response.status))
+               .catch((e) => reject(e));
+        });
+    }
+
+    expire() {
+        this.cleanTokens();
+        this.expired();
     }
 
     Debug(type, message) {

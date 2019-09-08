@@ -4,12 +4,17 @@
  This library allows you do easy way to manage JWT in localStorage or sessionStorage.
  
 **IMPORTANT: This library not validate JWT only check format and expiration time of token.**
+
+```
+From the version 2.0.0 code is totally rebased.
+If you use previous versions please check the new changes.
+```
  
 ## How to use
  For start you need instance `WebAuth` class.
 
 ```js
-const auth = new WebAuth({ token: String, remember: Boolean, debug: Boolean });
+const auth = new WebAuth({ tokens: Object, remember: Boolean, config: Object });
 ```
 
 After to instance the new manager need initialize.
@@ -17,7 +22,7 @@ After to instance the new manager need initialize.
 auth.init().then((result) => {
     // Here do something
     console.log(result);
-    // Output: { token: String, valid: Boolean, payload: Object, pathname: String, hash: String, search: Object }
+    // Output: { valid: Boolean, tokens: Object, payloads: Object, pathname: Object }
 })
 .catch(() => {
     // Is not valid
@@ -28,7 +33,8 @@ auth.init().then((result) => {
 For check when user reload app only you need is instance without token and `WebAuth` check automatically in localStorage and sessionStorage if exist valid JWT.
 
 ```js
-const auth = new WebAuth({});
+const auth = new WebAuth({...});
+
 auth.init().then((result) => {
     // Exist valid JWT
     // Ex: Redirect to result.pathname
@@ -46,7 +52,7 @@ For validate in your backend only need set key `checker` like object with the fo
 
 ```js
 ... = new WebAuth({
-    checker: {
+    config: {
         url: String,
         header: {
             Origin: 'https://mydefault.com:80',

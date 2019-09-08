@@ -4,8 +4,6 @@
     <list default="true" id="21f971f0-8410-49f2-89cd-c5ed27af6f0b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/web-auth.bundle.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/build/web-auth.bundle.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
@@ -38,7 +36,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -82,7 +80,16 @@
       <workItem from="1567263934237" duration="11333000" />
       <workItem from="1567385036711" duration="3548000" />
       <workItem from="1567715033796" duration="2541000" />
-      <workItem from="1567811112893" duration="10000" />
+      <workItem from="1567811112893" duration="56000" />
+      <workItem from="1567813223632" duration="2469000" />
+      <workItem from="1567889889569" duration="8673000" />
+      <workItem from="1567965644444" duration="1407000" />
+      <workItem from="1567969136887" duration="137000" />
+      <workItem from="1567969293211" duration="132000" />
+      <workItem from="1567969447989" duration="2713000" />
+      <workItem from="1567982003276" duration="323000" />
+      <workItem from="1567982347510" duration="258000" />
+      <workItem from="1567982624488" duration="1467000" />
     </task>
     <task id="LOCAL-00001" summary="FIX:Fixed the index file">
       <created>1566190932173</created>
@@ -133,7 +140,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566449310680</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="FIX:Added fetch function token">
+      <created>1567811153514</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1567811153514</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,7 +181,8 @@
     <MESSAGE value="FIX:Update with promises" />
     <MESSAGE value="NEW:Added pathname, hash, readme and future JWT HTTP check" />
     <MESSAGE value="FIX:Builded" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX:Builded" />
+    <MESSAGE value="FIX:Added fetch function token" />
+    <option name="LAST_COMMIT_MESSAGE" value="FIX:Added fetch function token" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
