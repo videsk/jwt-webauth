@@ -1,7 +1,7 @@
 # Front Authorization Handler
  A Javascript frontend authorization tokens manager/handler that works with JWT.
  
- This library allows you forget handle tokens, and instance easy way to manage JWT tokens in localStorage or sessionStorage and many more features.
+ This library allows you forget manage authorizations tokens, and instantiate a automatic way to manage JWT tokens in localStorage or sessionStorage and many more features.
  
 **IMPORTANT: If you not set backend validation, this library try "validate" JWT only checking format and expiration time of token. For secure validation of JWT you need the signature (backend).**
 
