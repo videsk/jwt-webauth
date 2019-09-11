@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21f971f0-8410-49f2-89cd-c5ed27af6f0b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -92,7 +94,9 @@
       <workItem from="1567982003276" duration="323000" />
       <workItem from="1567982347510" duration="258000" />
       <workItem from="1567982624488" duration="2223000" />
-      <workItem from="1568005812205" duration="5784000" />
+      <workItem from="1568005812205" duration="5844000" />
+      <workItem from="1568065004090" duration="2373000" />
+      <workItem from="1568216383601" duration="1362000" />
     </task>
     <task id="LOCAL-00001" summary="FIX:Fixed the index file">
       <created>1566190932173</created>
@@ -164,7 +168,14 @@
       <option name="project" value="LOCAL" />
       <updated>1568010588066</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="FIX:Some words corrected in README">
+      <created>1568011642476</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1568011642476</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -200,7 +211,8 @@
     <MESSAGE value="FIX:Builded" />
     <MESSAGE value="FIX:Added fetch function token" />
     <MESSAGE value="FIX:Added backend validation and refresh token" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX:Added backend validation and refresh token" />
+    <MESSAGE value="FIX:Some words corrected in README" />
+    <option name="LAST_COMMIT_MESSAGE" value="FIX:Some words corrected in README" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

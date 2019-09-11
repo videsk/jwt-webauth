@@ -25,7 +25,7 @@ class WebAuth {
             refresh: (keys && 'refresh' in keys) ? keys.refresh : 'auth-key-refresh' // Key of refresh token for save in local or session storage
         };
         this.debug = ('debug' in config && typeof config.debug === 'boolean') ? config.debug : false; // By default is false
-        this.remember = (typeof remember === 'boolean') ? remember : false; // By default is false
+        this.remember = (typeof remember === 'boolean') ? remember : undefined; // By default is undefined
         this.config = (typeof config === 'object') ? config : null; // Parameters for validate and get new token
         this.expired = (typeof expired === 'function') ? expired : () => {}; // Handler for positive or negative result of validation
         this.interval = { execute: null, try: 0 };
@@ -37,6 +37,8 @@ class WebAuth {
             this.tokens.access = this.tokens.access || this.getFromStorage(this.keys.access);
             // Save refresh token
             this.tokens.refresh = this.tokens.refresh || this.getFromStorage(this.keys.refresh);
+            // Set remember
+            this.remember = (typeof this.remember === 'boolean') ? this.remember : this.checkStorage(this.keys.access).remember;
             // Refresh or add token
             this.setup()
                 .then(() => {
@@ -123,11 +125,13 @@ class WebAuth {
     }
 
     checkStorage(key) {
-        return (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage'; // Get the store of token/refresh token
+        const storage = (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage'; // Get the store of token/refresh token
+        const remember = (storage === 'localStorage');
+        return { storage, remember };
     }
 
     getFromStorage(key) {
-        return window[this.checkStorage(key)].getItem(key);
+        return window[this.checkStorage(key).storage].getItem(key);
     }
 
     cleanTokens() {
@@ -298,7 +302,7 @@ class WebAuth {
 
     Debug(type, message) {
         const route = (typeof type === 'string') ? type : 'info';
-        if(this.debug) console[route](message);
+        if(this.config.debug) console[route](message);
     }
 }
 

@@ -162,3 +162,7 @@ If you need clean all tokens like log out, only need execute the follow code lin
 ```js
 auth.cleanTokens();
 ```
+
+# Issues
+
+If you want contribute go to [this repository](https://github.com/videsk/front-auth-handler).
