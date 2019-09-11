@@ -166,3 +166,7 @@ auth.cleanTokens();
 # Issues
 
 If you want contribute go to [this repository](https://github.com/videsk/front-auth-handler).
+
+# Changelog
+
+See changelog [here](https://github.com/videsk/front-auth-handler/blob/master/CHANGELOG.MD).

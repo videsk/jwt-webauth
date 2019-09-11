@@ -1,5 +1,9 @@
 # Changelog
 
+v2.0.7
+
+- [FIX] Added changelog to readme
+
 v2.0.6
 
 - [FIX] Auto detect storage or manually for set boolean in remember.
