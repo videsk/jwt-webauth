@@ -121,6 +121,7 @@ For validate in your backend only need set key `config` like object with the fol
                 access: String, // This is uses for access to object returned in HTTP request
                 refresh: String // This is uses for access to object returned in HTTP request
             },
+            status: Number // Status code when return an expired or invalid JWT (Mandatory if set backend validation)
         },
         // Authorization is added automatically.
         // Use prefix for set type of authorization
@@ -145,7 +146,7 @@ For validate in your backend only need set key `config` like object with the fol
 ### Expiration time
 When you initialize WebAuth, automatically create a expiration checker with a `setInterval` that check expiration of access token **every 1 second**. If token expires will be executed `expired` function.
 
-But if you set a `refresh token`, so WebAuth try to get a new `access token`. If the server return a 403 error, it runs `expired` function, but if the server returns other error different of 403, WebAuth enter in a loop for try 5 times, before apply a delay of 5 seconds.
+But if you set a `refresh token`, so WebAuth try to get a new `access token`. If the server return a error that match with `status` configured, it runs `expired` function, but if the server returns other different `status` error, WebAuth enter in a loop for try 5 times, before apply a delay of 5 seconds.
 
 This is designed for avoid crash app if the server is not available.
 

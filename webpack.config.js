@@ -2,9 +2,9 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: './index.js',
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'dist'),
         filename: 'web-auth.bundle.js',
         library: 'WebAuth',
         libraryTarget: 'umd'
@@ -15,6 +15,7 @@ module.exports = {
                 test: /\.js$/,
                 loader: 'babel-loader',
                 query: {
+                    sourceType: 'module',
                     presets: ['es2015']
                 }
             }
