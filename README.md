@@ -3,6 +3,8 @@
  
  This library allows you forget manage authorizations tokens, and instantiate an automatic way to manage JWT tokens in localStorage or sessionStorage and many more features.
  
+ ![license](https://camo.githubusercontent.com/76d5d2b7f6cb797adf6c30fafa4a2cb2f4390155/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f6d61746961736c6f70657a642f584465627567676572) ![size](https://img.shields.io/bundlephobia/min/@videsk/front-auth-handler) ![sizesrc](https://img.shields.io/github/size/videsk/front-auth-handler/index.js) ![issues](https://img.shields.io/github/issues-raw/videsk/front-auth-handler) ![rank](https://img.shields.io/librariesio/sourcerank/npm/@videsk/front-auth-handler) ![version](https://img.shields.io/npm/v/@videsk/front-auth-handler) ![downloads](https://img.shields.io/npm/dt/@videsk/front-auth-handler)
+ 
 **IMPORTANT: If you not set backend validation, this library try "validate" JWT only checking format and expiration time of token. For secure validation of JWT you need the signature (backend).**
 
 ```
@@ -20,6 +22,15 @@ If you use previous versions please check the new changes.
 * Custom function for expiration
 
 Also you can access to all functions manually.
+
+## Installation
+
+From NPM
+
+`npm i @videsk/front-auth-handler`
+
+
+
 
  
 ## How to use
