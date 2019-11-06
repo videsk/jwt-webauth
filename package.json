@@ -1,6 +1,6 @@
 {
   "name": "@videsk/front-auth-handler",
-  "version": "2.1.11",
+  "version": "2.1.12",
   "description": "A Javascript frontend authorization key handler for works with JWT.",
   "main": "index.js",
   "scripts": {

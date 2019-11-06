@@ -360,7 +360,7 @@ export default class WebAuth {
     CheckStatus(status) {
         this.Debug('info', 'Checking status of fetch... (361)');
         this.Debug('info', `The status is ${status}... (362)`);
-        const DefaultStatus = (this.validateURL() && 'status' in this.config.url.status) && this.config.url.status;
+        const DefaultStatus = (this.validateURL() && 'status' in this.config.url) && this.config.url.status;
         return DefaultStatus === status;
     }
 
