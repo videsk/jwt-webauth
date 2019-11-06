@@ -29,9 +29,9 @@ From NPM
 
 `npm i @videsk/front-auth-handler`
 
+Self hosted
 
-
-
+`<script src="/dist/web-auth.bundle.js"></script>`
  
 ## How to use
 For start you need instance `WebAuth` class.
