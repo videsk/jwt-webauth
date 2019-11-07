@@ -248,7 +248,7 @@ export default class WebAuth {
                     // Create a new header
                     const header = new Headers();
                     // Destructing object and get keys
-                    const { headers, url, prefix, methods, bodies } = this.config;
+                    const { headers, url, prefix, methods } = this.config;
                     // Map checker object only if exist
                     if (headers && headers[token]) Object.keys(headers).map(key => {
                         // Key to lower case
@@ -260,12 +260,15 @@ export default class WebAuth {
                     // Add to header objects
                     header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens['access']}`);
                     this.Debug('info', `Fetching to ${url.base}/${endpoint}... (262)`);
-                    // fetch to url
-                    fetch(`${url.base}/${endpoint}`, {
-                        method: (methods) ? methods[token] : 'POST',
+                    // Set payload
+                    const PayloadFetch = {
+                        method: (methods && methods[token]) ? methods[token] : 'POST',
                         headers: header,
-                        body: this.ParseKeysBody(),
-                    })
+                    };
+                    // Add body if method is POST
+                    if (PayloadFetch.method === 'POST') Object.assign(PayloadFetch, { body: this.ParseKeysBody() });
+                    // fetch to url
+                    fetch(`${url.base}/${endpoint}`, PayloadFetch)
                         .then(response => {
                             this.Debug('info', `Response with code ${response.status}... (270)`);
                             // Return depending of status response
@@ -364,7 +367,7 @@ export default class WebAuth {
     ParseKeysBody() {
         const { refresh } = (this.validateURL()) ? this.config.bodies : {};
         this.Debug('info', 'Trying to set refresh token in body... (366');
-        if (this.validateURL() && refresh) this.config.bodies.refresh[this.config.url.keys.refresh] = this.tokens.refresh;
+        if (refresh) this.config.bodies.refresh[this.config.url.keys.refresh] = this.tokens.refresh;
         return (this.validateURL()) ? this.config.bodies.refresh : {};
     }
 
