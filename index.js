@@ -264,7 +264,7 @@ export default class WebAuth {
                     fetch(`${url.base}/${endpoint}`, {
                         method: (methods) ? methods[token] : 'POST',
                         headers: header,
-                        body: (bodies) ? bodies[token] : {},
+                        body: this.ParseKeysBody(),
                     })
                         .then(response => {
                             this.Debug('info', `Response with code ${response.status}... (270)`);
@@ -359,6 +359,13 @@ export default class WebAuth {
                reject(e);
            }
         });
+    }
+
+    ParseKeysBody() {
+        const { refresh } = (this.validateURL()) ? this.config.bodies : {};
+        this.Debug('info', 'Trying to set refresh token in body... (366');
+        if (this.validateURL() && refresh) this.config.bodies.refresh[this.config.url.keys.refresh] = this.tokens.refresh;
+        return (this.validateURL()) ? this.config.bodies.refresh : {};
     }
 
     CheckStatus(status) {
