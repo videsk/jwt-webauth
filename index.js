@@ -12,7 +12,7 @@
 
 import jwt_decode from 'jwt-decode';
 
-export default class WebAuth {
+module.exports = class WebAuth {
 
     constructor({ keys, tokens, remember, config, expired }) {
         this.tokens = {
@@ -178,6 +178,7 @@ export default class WebAuth {
         // Remove from sessionStorage
         window.sessionStorage.removeItem(this.keys.access);
         window.sessionStorage.removeItem(this.keys.refresh);
+        window.clearInterval(this.interval.execute);
     }
 
     getPathname() {
@@ -266,7 +267,7 @@ export default class WebAuth {
                         headers: header,
                     };
                     // Add body if method is POST
-                    if (PayloadFetch.method === 'POST') Object.assign(PayloadFetch, { body: this.ParseKeysBody() });
+                    if (PayloadFetch.method === 'POST') Object.assign(PayloadFetch, { body: JSON.stringify(this.ParseKeysBody()) });
                     // fetch to url
                     fetch(`${url.base}/${endpoint}`, PayloadFetch)
                         .then(response => {
@@ -279,6 +280,7 @@ export default class WebAuth {
                         .catch((error) => {
                             this.Debug('error', 'Something is bad, please check request in Network DevTools tab.');
                             this.Debug('error', error);
+                            this.cleanTokens();
                         }); // Reject, is not valid or something happen with server/url
                 } else {
                     this.Debug('info', 'Exiting HTTP validation... (272)');
