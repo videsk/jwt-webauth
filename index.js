@@ -113,7 +113,9 @@ export default class WebAuth {
                 **  in other case reject and execute return catch
                 */
                 // Add checker for expiration time of JWT
-                this.createChecker();
+                if (!this.interval.execute) this.createChecker();
+                // Update token of header
+                this.UpdateHeader();
                 // Finish
                 resolve();
             }
@@ -260,7 +262,8 @@ export default class WebAuth {
                     this.Debug('info', `Adding access token to header... (259)`);
                     // Add to header objects
                     header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens['access']}`);
-                    header.append('Content-Type', 'application/json');
+                    if (this.validateURL() && 'contentType' in this.config.url) header.append('Content-Type', this.config.url.contentType);
+                    else header.append('Content-Type', 'application/json');
                     this.Debug('info', `Fetching to ${url.base}/${endpoint}... (262)`);
                     // Set payload
                     const PayloadFetch = {
@@ -323,19 +326,23 @@ export default class WebAuth {
         this.Debug('info', 'Creating checker... (317)');
         // Handler of JWT expiration
         const handler = () => {
-            if (!this.checkExpiration('access') && this.interval.try <= 5) {
+            // Get the expiration of token
+            const expired = this.checkExpiration();
+
+            if (!expired) {
+                this.Debug('info', 'Token has expired, trying to get a new... (330)');
                 // Clear interval
                 window.clearInterval(this.interval.execute);
+                this.Debug('info', 'Cleaning interval... (333)');
                 // First try to get a new access token with the refresh token
                 if (this.validateURL()
-                    && 'refresh' in this.tokens) this.getNewToken().catch((status) => (this.CheckStatus(status)) ? this.expire() : this.createChecker(this.interval.try++));
+                    && 'refresh' in this.tokens) this.getNewToken()
+                        .catch((status) => (this.CheckStatus(status)) ? this.expire() : this.createChecker(this.interval.try++));
                     // If the response is with 4XX Forbidden execute expired function
                     // Else maybe the server have a bad day and need create the checker again
                 // If you don't have refresh token implementation only expire token
                 else this.expire();
             }
-            // If the server die or something goes wrong, try recursive but with 5 seconds of delay
-            else if (this.interval.try > 5) setTimeout(() => this.createChecker(this.interval.try = 0), 5000);
         };
         // Create interval
         this.interval.execute = window.setInterval(handler, 1000);
@@ -378,6 +385,11 @@ export default class WebAuth {
         this.Debug('info', `The status of response ${status}... (362)`);
         const DefaultStatus = (this.validateURL() && 'status' in this.config.url) && this.config.url.status;
         return DefaultStatus === status;
+    }
+
+    UpdateHeader() {
+        if (this.validateURL() && 'updateToken' in this.config) this.config.updateToken();
+        this.Debug('info', 'Updating header token... (387)');
     }
 
     expire() {

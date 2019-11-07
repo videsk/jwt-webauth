@@ -132,7 +132,8 @@ For validate in your backend only need set key `config` like object with the fol
                 access: String, // This is uses for access to object returned in HTTP request
                 refresh: String // This is uses for access to object returned in HTTP request
             },
-            status: Number // Status code when return an expired or invalid JWT (Mandatory if set backend validation)
+            status: Number, // Status code when return an expired or invalid JWT (Mandatory if set backend validation)
+            contentType: String // Please read about MIME
         },
         // Authorization is added automatically.
         // Use prefix for set type of authorization
@@ -150,6 +151,7 @@ For validate in your backend only need set key `config` like object with the fol
             access: Object || String, // Optional, by default is empty object
             refresh: Object || String, // Optional, by default is empty object
         },
+        updateToken: Function, // Add your custom function
     }
 });
 ```
