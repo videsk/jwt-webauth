@@ -12,7 +12,7 @@
 
 import jwt_decode from 'jwt-decode';
 
-module.exports = class WebAuth {
+export default class WebAuth {
 
     constructor({ keys, tokens, remember, config, expired }) {
         this.tokens = {
@@ -71,7 +71,7 @@ module.exports = class WebAuth {
                                     this.Debug('info', 'Access token expired... (66)');
                                     this.Debug('info', 'Trying to get a new... (67)');
                                     if (this.CheckStatus(status) && 'refresh' in this.tokens) this.getNewToken()
-                                      .then(() => resolve())
+                                      .then(() => resolve(finalObj))
                                       .catch(e => reject(e));
                                 });
                             else reject();
@@ -260,6 +260,7 @@ module.exports = class WebAuth {
                     this.Debug('info', `Adding access token to header... (259)`);
                     // Add to header objects
                     header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens['access']}`);
+                    header.append('Content-Type', 'application/json');
                     this.Debug('info', `Fetching to ${url.base}/${endpoint}... (262)`);
                     // Set payload
                     const PayloadFetch = {
@@ -273,7 +274,7 @@ module.exports = class WebAuth {
                         .then(response => {
                             this.Debug('info', `Response with code ${response.status}... (270)`);
                             // Return depending of status response
-                            if (response.status === 200 || response.status === 204) this.parse(response)
+                            if (response.status > 199 && response.status < 300) this.parse(response)
                                 .then((r) => resolve(r));
                             else reject(response.status);
                         })
@@ -327,10 +328,9 @@ module.exports = class WebAuth {
                 window.clearInterval(this.interval.execute);
                 // First try to get a new access token with the refresh token
                 if (this.validateURL()
-                    && 'refresh' in this.tokens) this.getNewToken()
+                    && 'refresh' in this.tokens) this.getNewToken().catch((status) => (this.CheckStatus(status)) ? this.expire() : this.createChecker(this.interval.try++));
                     // If the response is with 4XX Forbidden execute expired function
                     // Else maybe the server have a bad day and need create the checker again
-                    .catch((status) => (this.CheckStatus(status)) ? this.expire() : this.createChecker(this.interval.try++));
                 // If you don't have refresh token implementation only expire token
                 else this.expire();
             }
