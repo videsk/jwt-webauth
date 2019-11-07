@@ -256,10 +256,10 @@ export default class WebAuth {
                         // check the key is not reserved
                         if (foo !== 'authorization') header.append(key, headers[key]);
                     });
-                    this.Debug('info', `Adding access token to header... (260)`);
+                    this.Debug('info', `Adding access token to header... (259)`);
                     // Add to header objects
                     header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens['access']}`);
-                    this.Debug('info', `Fetching to ${url.base}/${endpoint}... (258)`);
+                    this.Debug('info', `Fetching to ${url.base}/${endpoint}... (262)`);
                     // fetch to url
                     fetch(`${url.base}/${endpoint}`, {
                         method: (methods) ? methods[token] : 'POST',
@@ -267,11 +267,11 @@ export default class WebAuth {
                         body: (bodies) ? bodies[token] : {},
                     })
                         .then(response => {
-                            this.Debug('info', `Response with code ${response.status}... (2)`);
+                            this.Debug('info', `Response with code ${response.status}... (270)`);
                             // Return depending of status response
                             if (response.status === 200 || response.status === 204) this.parse(response)
                                 .then((r) => resolve(r));
-                            else reject(response);
+                            else reject(response.status);
                         })
                         .catch((response) => {
                             this.Debug('info', 'Something is bad, please check request in Network DevTools tab.');
@@ -290,7 +290,7 @@ export default class WebAuth {
 
     getNewToken() {
         return new Promise((resolve, reject) => {
-            this.Debug('info', 'Trying to get a new access token... (271)');
+            this.Debug('info', 'Trying to get a new access token... (292)');
             if (this.validateURL() && 'refresh' in this.tokens) {
                 // Get endpoint of refresh token
                 const {endpoints, keys} = this.config.url;
@@ -314,7 +314,7 @@ export default class WebAuth {
         * with the refresh token, if is exist refresh token
         * All expires if server return error 4XX
          */
-        this.Debug('info', 'Creating checker... (295)');
+        this.Debug('info', 'Creating checker... (317)');
         // Handler of JWT expiration
         const handler = () => {
             if (!this.checkExpiration('access') && this.interval.try <= 5) {
@@ -337,7 +337,7 @@ export default class WebAuth {
     }
 
     validateURL() {
-        this.Debug('info', 'Validating URL... (318)');
+        this.Debug('info', 'Validating URL key... (340)');
         // Validate exist all keys and types of keys are correct
         return (typeof this.config === 'object'
             && 'url' in this.config
@@ -365,7 +365,7 @@ export default class WebAuth {
     }
 
     expire() {
-        this.Debug('info', 'Token has expired... (339)');
+        this.Debug('info', 'Token has expired... (368)');
         this.cleanTokens();
         this.expired();
     }
