@@ -273,9 +273,9 @@ export default class WebAuth {
                                 .then((r) => resolve(r));
                             else reject(response.status);
                         })
-                        .catch((response) => {
-                            this.Debug('info', 'Something is bad, please check request in Network DevTools tab.');
-                            this.parse(response).then((x, status) => reject(status));
+                        .catch((error) => {
+                            this.Debug('error', 'Something is bad, please check request in Network DevTools tab.');
+                            this.Debug('error', error);
                         }); // Reject, is not valid or something happen with server/url
                 } else {
                     this.Debug('info', 'Exiting HTTP validation... (272)');
@@ -295,7 +295,7 @@ export default class WebAuth {
                 // Get endpoint of refresh token
                 const {endpoints, keys} = this.config.url;
                 // Get new token if the access token expired
-                this.checkHTTP({ endpoint: endpoints.access, token: 'refresh' })
+                this.checkHTTP({ endpoint: endpoints.refresh, token: 'refresh' })
                     .then((response) => {
                         // Set new access token
                         this.tokens.access = response[keys.access];
@@ -351,9 +351,13 @@ export default class WebAuth {
         // Parse fetch
         return new Promise((resolve, reject) => {
             this.Debug('info', 'Parsing fetch response... (353)');
-           response.json()
+           try {
+               response.json()
                .then((r) => resolve(r, response.status))
                .catch((e) => reject(e));
+           } catch(e) {
+               reject(e);
+           }
         });
     }
 
