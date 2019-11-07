@@ -53,7 +53,7 @@ export default class WebAuth {
                             const pathnameObject = { pathname: Object.assign(this.getSearchOrHash(), this.nestedPathname()) };
                             this.Debug('info', 'Creating final object with token, payload and pathname... (53)');
                             // base object
-                            const finalObj = { valid, tokens: this.tokens, payloads: this.payloads };
+                            const finalObj = { valid: !valid, tokens: this.tokens, payloads: this.payloads };
                             // merge two obj
                             Object.assign(finalObj, pathnameObject);
                             this.Debug('info', `Is valid? --> ${this.validateURL()}... (59)`);
@@ -113,9 +113,10 @@ export default class WebAuth {
                 **  in other case reject and execute return catch
                 */
                 // Add checker for expiration time of JWT
-                if (!this.interval.execute) this.createChecker();
+                this.createChecker();
                 // Update token of header
-                this.UpdateHeader();
+                try { this.UpdateHeader(); }
+                catch (e) { this.Debug('error', e); }
                 // Finish
                 resolve();
             }
@@ -123,7 +124,7 @@ export default class WebAuth {
         });
     }
 
-    checkExpiration(token) {
+    checkExpiration(token = 'access') {
         return new Promise((resolve, reject) => {
            try {
                this.Debug('info', 'Checking token expiration... (125)');
@@ -132,10 +133,10 @@ export default class WebAuth {
                 // Get local time of user
                 const today = new Date().getTime();
                 // Check if the expiration date is greater of today
-                const valid = expiration >= today;
-                this.Debug('info', `The token is ${valid}... (132)`);
+                const expired = expiration <= today;
+                this.Debug('info', `The token is ${(expired) ? 'expired' : 'not expired'}... (132)`);
                 // Return value in callback or directly
-                resolve(valid);
+                resolve(expired);
            }
            catch(e) {reject(e)};
         });
@@ -327,22 +328,24 @@ export default class WebAuth {
         // Handler of JWT expiration
         const handler = () => {
             // Get the expiration of token
-            const expired = this.checkExpiration();
-
-            if (!expired) {
-                this.Debug('info', 'Token has expired, trying to get a new... (330)');
-                // Clear interval
-                window.clearInterval(this.interval.execute);
-                this.Debug('info', 'Cleaning interval... (333)');
-                // First try to get a new access token with the refresh token
-                if (this.validateURL()
-                    && 'refresh' in this.tokens) this.getNewToken()
+            this.checkExpiration('access')
+              .then(expired => {
+                  if (expired) {
+                      this.Debug('info', 'Token has expired, trying to get a new... (330)');
+                      // Clear interval
+                      window.clearInterval(this.interval.execute);
+                      this.Debug('info', 'Cleaning interval... (333)');
+                      // First try to get a new access token with the refresh token
+                      if (this.validateURL()
+                        && 'refresh' in this.tokens) this.getNewToken()
                         .catch((status) => (this.CheckStatus(status)) ? this.expire() : this.createChecker(this.interval.try++));
-                    // If the response is with 4XX Forbidden execute expired function
-                    // Else maybe the server have a bad day and need create the checker again
-                // If you don't have refresh token implementation only expire token
-                else this.expire();
-            }
+                      // If the response is with 4XX Forbidden execute expired function
+                      // Else maybe the server have a bad day and need create the checker again
+                      // If you don't have refresh token implementation only expire token
+                      else this.expire();
+                  }
+              })
+              .catch(e => this.Debug('error', e));
         };
         // Create interval
         this.interval.execute = window.setInterval(handler, 1000);
