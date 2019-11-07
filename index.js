@@ -302,7 +302,7 @@ export default class WebAuth {
                         // Setup the new token in storage
                         this.setup()
                             .then(() => resolve())
-                            .catch(() => reject());
+                            .catch((msg) => reject(msg));
                     })
                     .catch((status) => reject(status));
             } else reject(this.Debug('error', '[Auth Web] Trying to get a access token without mandatory keys.'));
@@ -359,7 +359,7 @@ export default class WebAuth {
 
     CheckStatus(status) {
         this.Debug('info', 'Checking status of fetch... (361)');
-        this.Debug('info', `The status is ${status}... (362)`);
+        this.Debug('info', `The status of response ${status}... (362)`);
         const DefaultStatus = (this.validateURL() && 'status' in this.config.url) && this.config.url.status;
         return DefaultStatus === status;
     }
