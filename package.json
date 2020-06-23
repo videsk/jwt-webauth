@@ -1,0 +1,34 @@
+{
+  "name": "@videsk/front-auth-handler",
+  "version": "2.2.6",
+  "description": "A Javascript frontend authorization key handler for works with JWT.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "authorization",
+    "JWT",
+    "key",
+    "frontend"
+  ],
+  "author": "videsk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videsk/front-auth-handler.git"
+  },
+  "homepage": "https://developers.videsk.io",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "jwt-decode": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-es2015": "^6.24.1",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
+  }
+}
