@@ -63,6 +63,13 @@ class WebAuth {
         this._stop = false;
     }
 
+    /**
+     * Set WebAuth and start observer
+     * @param access {String} - accessToken
+     * @param refresh {String} - refreshToken
+     * @param remember {Boolean} - Save in session or local storage
+     * @returns {Promise<*|undefined>}
+     */
     async set(access = '', refresh = '', remember) {
         if (typeof remember === 'boolean') this.storage = remember ? 'localStorage' : 'sessionStorage';
         const { accessToken = access, refreshToken = refresh } = this.constructor.getStorage(this.storage, this.keys);
@@ -86,10 +93,18 @@ class WebAuth {
         }
     }
 
+    /**
+     * Set event
+     * @param event
+     * @param callback
+     */
     on(event = '', callback = () => {}) {
         this.events[event] = callback;
     }
 
+    /**
+     * Clean tokens from storage
+     */
     clean() {
         // Remove from localStorage
         window.localStorage.removeItem(this.keys.accessToken);
@@ -99,6 +114,10 @@ class WebAuth {
         window.sessionStorage.removeItem(this.keys.refreshToken);
     }
 
+    /**
+     * Start expiration tokens observer
+     * @returns {Promise<*|undefined>|NodeJS.Timeout|*}
+     */
     observer(attempts = 1) {
         if (this._stop || !this._expirationAccessToken) return;
         const isAccessTokenExpired = new Date().getTime() > this._expirationAccessToken;
@@ -109,6 +128,10 @@ class WebAuth {
         return this.renew(attempts);
     }
 
+    /**
+     * Force renew accessToken
+     * @returns {Promise<*|undefined|NodeJS.Timeout>}
+     */
     async renew(attempts = 1) {
         // Check refreshToken was not expired
         const isRefreshTokenExpired = new Date().getTime() > this._expirationRefreshToken;
@@ -131,6 +154,11 @@ class WebAuth {
         }
     }
 
+    /**
+     * Send to server request to check or renew access token
+     * @param tokenName {String} - Could be accessToken or refreshToken
+     * @returns {Promise<any>}
+     */
     async askServer(tokenName = 'accessToken') {
         if (this._stop) return;
         const {url, body, headers, method, authorizationType, keys, status} = this.config.endpoints[tokenName];
@@ -150,28 +178,55 @@ class WebAuth {
         throw this.events.expired(tokenName);
     }
 
+    /**
+     * Stop observer and clean tokens
+     * @param value
+     */
     stop(value = true) {
         this._stop = value;
         this.clean();
     }
 
+    /**
+     * Get tokens from storage
+     * @param storage {String} - Session or local storage
+     * @param keys {Object} - Key names of storage
+     * @returns {{accessToken: *, refreshToken: *}}
+     */
     static getTokens(storage = 'sessionStorage', keys = {}) {
         const accessToken = window[storage].getItem(keys.accessToken);
         const refreshToken = window[storage].getItem(keys.refreshToken);
         return (accessToken || refreshToken) ? { accessToken, refreshToken } : {};
     }
 
+    /**
+     * Save tokens in storage
+     * @param storage {String} - Name of storage
+     * @param keys {Object} - Key names of storage
+     * @param accessToken {String} - JWT access
+     * @param refreshToken {String} - JWT refresh
+     */
     static saveTokens(storage = 'sessionStorage', keys = {}, accessToken = '', refreshToken = '') {
         window[storage].setItem(keys.accessToken, accessToken);
         window[storage].setItem(keys.refreshToken, refreshToken);
     }
 
+    /**
+     * Get expiration of JWT
+     * @param JWT {String} - Valid JWT
+     * @returns {number|number}
+     */
     static getExpirationToken(JWT = '') {
         const decoded = jwt(JWT);
         if (typeof decoded !== 'object') throw new Error('Invalid JWT, please check.');
         return ('exp' in decoded) ? decoded.exp * 1000 : Infinity;
     }
 
+    /**
+     * Get the name of storage based on tokens existence
+     * @param key
+     * @returns {string} - Key name want search in storage
+     */
     static getStorage(key = '') {
         return (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage';
     }
