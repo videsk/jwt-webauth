@@ -1,346 +1,188 @@
-import jwt_decode from 'jwt-decode';
+const jwt = require('jwt-decode');
 
-/**
- * Class to handle access and refresh JWT tokens for renewal and check validation.
- * This library provide you automatic check validation over time expiration and server.
- * Also every 1 second check locally if access token was expired and try to renewal with a refresh token in case you have it
- * doing a HTTP request to custom endpoints.
- */
-export default class WebAuth {
+class WebAuth {
 
-    /**
-     * @param Object.[keys] {Object=} - Object with keys name to save in storage.
-     * @param Object.[keys.access] {String} - Key name of access token.
-     * @param Object.[keys.refresh] {String} - Key name of refresh token.
-     * @param Object.tokens {Object} - Object with access and refresh token.
-     * @param Object.tokens.access {String} - JWT access token.
-     * @param Object.tokens.refresh {String} - JWT refresh token.
-     * @param Object.[remember] {Boolean} - Save session after close window/browser or not.
-     * @param Object.config {Object} - Object with configuration.
-     * @param Object.config.url {Object} - Object with authorization endpoints configuration.
-     * @param Object.config.url.base {String} - FQDN of Rest API.
-     * @param Object.config.url.endpoints {Object} - Object with endpoints of check and renewal.
-     * @param Object.config.url.endpoints.check {String} - Endpoint to check validation of JWT access token.
-     * @param Object.config.url.endpoints.refresh {String} - Endpoint to renewal JWT access token providing refresh token.
-     * @param Object.config.url.keys {Object} - Object with access and refresh keys names to get in HTTP response
-     * @param Object.config.url.keys.access {String} - Key name to get access token in response.
-     * @param Object.config.url.keys.refresh {String} - Key name to get refresh token in response.
-     * @param Object.config.url.status {Number} - HTTP status code you will expect receive in endpoint of access token renewal.
-     * @param Object.config.url.contentType {String} - Content-Type of request to set in headers.
-     * @param Object.config.url.mime="json" {String} - Type of parser to use in HTTP response, read about https://developer.mozilla.org/es/docs/Web/API/Body.
-     * @param Object.config.headers {Object<any>} - Add custom headers to set in check and renewal HTTP request.
-     * @param Object.[config.prefix]="Bearer" {String} - Prefix of Authorization header.
-     * @param Object.config.methods {Object} - Object with access and refresh endpoints method.
-     * @param Object.config.methods.access {String} - Method of endpoint to check validation of access token.
-     * @param Object.config.methods.refresh {String} - Method of endpoint to renewal access token.
-     * @param Object.[config.bodies] {Object} - Add custom payload to send in HTTP requests.
-     * @param Object.[config.bodies.access={}] {Object|String} - Custom body to send in check validation of access token.
-     * @param Object.[config.bodies.refresh={}] {Object|String} - Custom body to send in renewal of access token.
-     * @param Object.[config.maxAttempts] {number} - Number of attempts before set refresh token expired by no-internet or >=500 status code.
-     * @param Object.config.updateToken {Function} - Function fired after renewal access token successfully, useful for use with axios or any http framework that manage Authorization header.
-     * @param Object.expired {Function} - Event fired when refresh token is expired.
-     */
-    constructor({
-        keys = {access: 'auth-key', refresh: 'auth-key-refresh'},
-        tokens = {access: null, refresh: null},
-        remember = false,
-        config = {},
-        expired = () => {},
-    }) {
-        this.tokens = tokens;
+    constructor(options = {}) {
+        const {
+            keys = { accessToken: 'auth-key', refreshToken: 'auth-key-refresh' },
+            config = {
+                endpoints: {
+                    hostname: 'http://localhost:3000/',
+                    accessToken: {
+                        url: 'check-token',
+                        method: 'GET',
+                        authorizationType: 'Bearer',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {},
+                        keys: {
+                            accessToken: 'accessToken',
+                            refreshToken: 'refreshToken',
+                        },
+                        status: {
+                            expired: 401,
+                            ok: 200,
+                        },
+                        attempts: 3
+                    },
+                    refreshToken: {
+                        url: 'refresh-token',
+                        method: 'POST',
+                        authorizationType: 'Bearer',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {},
+                        keys: {
+                            accessToken: 'accessToken',
+                            refreshToken: 'refreshToken',
+                        },
+                        status: {
+                            expired: 401,
+                            ok: 201,
+                        },
+                        attempts: 3
+                    },
+                },
+            },
+        } = options;
+
         this.keys = keys;
-        this.remember = remember;
+        this.events = {
+            expired: () => {},
+            error: () => {},
+            renewed: () => {},
+            empty: () => {},
+        };
         this.config = config;
-        this.expired = expired;
+        this.storage = (window.localStorage.getItem(this.keys.accessToken)) ? 'localStorage' : 'sessionStorage';
 
-        this.payloads = { access: null, refresh: null }; // Payload of access and refresh token
-        this._interval = null;
+        this._expirationAccessToken = null;
+        this._expirationRefreshToken = null;
+        this._stop = false;
     }
 
-    /**
-     * Initialize WebAuth
-     * @returns {Promise<Error|*>}
-     * @public
-     */
-    async init() {
-        return new Promise(async (resolve) => {
-            this._setTokens();
-            this.remember = this.remember || this.constructor.checkStorage(this.keys.access).remember;
-            this._setup();
-
-            const expired = await this.checkExpiration('access');
-            const pathnameObject = {pathname: Object.assign(this.constructor.getSearchOrHash(), this._nestedPathname())};
-            const payload = {valid: !expired, tokens: this.tokens, payloads: this.payloads};
-            const finalResult = Object.assign(payload, pathnameObject);
-
-            const {access} = (this._validateURL()) ? this.config.url['endpoints'] : {};
-            if (!access) throw new Error('Please check the endpoints object in config key');
-
-            const serverResult = await this._toServer({endpoint: access}).catch(status => status);
-            if (typeof serverResult === 'object') resolve(finalResult);
-
-            if (!(this._checkStatus(serverResult) && 'refresh' in this.tokens)) return new Error(`Server respond with status code ${serverResult} and expect ${this.config.url.status}.`);
-
-            const newToken = await this._getNewAccessToken();
-            if (!(newToken instanceof Error)) resolve(finalResult);
-            return new Error(`Server respond with status code ${newToken} and expect ${this.config.url.status}.`);
-        });
-    }
-
-    /**
-     * Check if the token is expired or not
-     * @param token {String<JWT>} - JWT token you want check
-     * @returns {boolean} - Expiration value of JWT
-     * @public
-     */
-    checkExpiration(token = 'access') {
-        const expiration = this.payloads[token].exp * 1000;
-        return expiration <= new Date().getTime();
-    }
-
-    /**
-     * Clean tokens from storage and interval
-     * @public
-     */
-    cleanTokens() {
-        // Remove from localStorage
-        window.localStorage.removeItem(this.keys.access);
-        window.localStorage.removeItem(this.keys.refresh);
-        // Remove from sessionStorage
-        window.sessionStorage.removeItem(this.keys.access);
-        window.sessionStorage.removeItem(this.keys.refresh);
-        window.clearInterval(this._interval);
-    }
-
-    /**
-     * Function to set expired JWT and clean tokens
-     * @public
-     */
-    expire() {
-        this.cleanTokens();
-        this.expired();
-    }
-
-    /**
-     * Set JWT access and refresh tokens
-     * @param access {String<JWT>} - Access JWT token
-     * @param refresh {String<JWT>} - Refresh JWT token
-     * @returns {{access: String|null, refresh: String|null}} - Object with access and refresh tokens
-     * @private
-     */
-    _setTokens(access = null, refresh = null) {
-        if (access) this.tokens.access = access || this.tokens.access || this._getFromStorage(this.keys.access);
-        if (refresh) this.tokens.refresh = refresh || this.tokens.access || this._getFromStorage(this.keys.refresh);
-        return {access: this.tokens.access, refresh: this.tokens.access};
-    }
-
-    /**
-     * Setup JWT access and refresh tokens on storage, create checker and fire event update access token.
-     * @private
-     */
-    _setup() {
-        const storage = (this.remember) ? 'localStorage' : 'sessionStorage';
-        this.cleanTokens();
-        if (!this.tokens.access) throw new Error('accessToken is not defined');
-        window[storage].setItem(this.keys.access, this.tokens.access);
-
-        if (this.tokens.refresh) window[storage].setItem(this.keys.refresh, this.tokens.refresh);
-
-        this._setPayload('access');
-        if (this.tokens.access) this._setPayload('refresh');
-
-        this._createChecker();
-        this._updateAccessToken(); // This fire event to update access token in frameworks like axios
-    }
-
-    /**
-     * Decode and set payload of access or refresh JWT
-     * @param token {String<JWT>} - Name of token key like access or refresh
-     * @private
-     */
-    _setPayload(token = null) {
-        if (!token) throw new Error('Please provide a correct token type in _setPayload.');
-        const payload = jwt_decode(this.tokens[token]);
-        this.payloads[token] = (typeof payload === 'object') ? payload : {};
-        if (typeof payload !== 'object') new Error('JWT is not valid, please check structure.');
-    }
-
-    /**
-     * Get storage option for JWT token and remember option based on storage
-     * @param key {String} - Storage key name
-     * @returns {{remember: boolean, storage: (string)}}
-     */
-    static checkStorage(key = '') {
-        const storage = (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage';
-        const remember = (storage === 'localStorage');
-        return { storage, remember };
-    }
-
-    /**
-     * Get value from storage
-     * @param key {String} - Storage key name
-     * @returns {String<JWT>} - Return JWT token
-     * @private
-     */
-    _getFromStorage(key) {
-        return window[this.constructor.checkStorage(key).storage].getItem(key);
-    }
-
-    /**
-     * Get pathname of current window [WARNING]: Caution using with iframe
-     * @param path {String} - Set if you want take from parent or top
-     * @returns {*|string} - Pathname
-     */
-    static getPathname(path = null) {
-        return (path) ? window.location.pathname : window[path].location.pathname; // Get the pathname
-    }
-
-    /**
-     * Return pathname in object format and nested indexed schema
-     * @returns {{plain: (*|string), byLevels: *}}
-     * @private
-     */
-    _nestedPathname() {
-        let pathname = this.constructor.getPathname();
-        const split = pathname.split('/').shift();
-        const byLevels = split.map((path, index) => ({ path, level: index }));
-        return {plain: this.constructor.getPathname(), byLevels};
-    }
-
-    /**
-     * Get search or hash of current window
-     * @param path {String} - Set if you want take from parent or top
-     * @returns {{}}
-     */
-    static getSearchOrHash(path = null) {
-        const searchFormatter = parameters => {
-          const object = {};
-          parameters.split('&').forEach(parameter => object[parameter.split('=')[0]] = parameter.split('=')[1]);
-          return object;
-        };
-        const formatter = value => {
-            const object = {};
-            const parameters = value.split('?');
-            parameters.forEach(parameter => {
-                if (parameter.includes('#')) object.hash = parameter.replace('#');
-                else if (parameter.includes('&')) object.search = searchFormatter(parameter);
-            });
-            return object;
-        };
-        const {search, hash} = (path) ? window.location : window[path].location;
-        return (search) ? formatter(search) : formatter(hash);
-    }
-
-    /**
-     * Send to server a request for check validation or get a new access token.
-     * @param endpoint {String} - Rest API endpoint.
-     * @param token {String} - Key object where is configuration to do the request.
-     * @returns {Promise<Error|any>}
-     * @private
-     */
-    async _toServer({endpoint, token = 'access'}) {
-        if (!this._validateURL()) return;
-        const header = new Headers();
-        const {headers, url: { base }, prefix, methods} = this.config;
-        if (headers && headers[token]) Object.keys(headers).forEach(key => {
-           const keyToLowerCase = key.toLowerCase();
-           if (keyToLowerCase !== 'authorization') header.append(key, headers[key]);
-        });
-        header.append('Authorization', `${prefix || 'Bearer'} ${this.tokens['access']}`);
-        if (this._validateURL() && 'contentType' in this.config.url) header.append('Content-Type', this.config.url.contentType);
-        else header.append('Content-Type', 'application/json');
-
-        const payloadFetch = {
-            method: (methods && methods[token]) ? methods[token] : 'POST',
-            headers: header,
-        };
-        if (payloadFetch.method === 'POST') payloadFetch.body = JSON.stringify(this._parseBodyKeys());
-
-        const response = await fetch(`${base}/${endpoint}`, payloadFetch);
-        if (response instanceof Error) return new Error('Ups, something happen with your internet.');
-
-        const status = response.status;
-        const mimeType = (this._validateURL() && 'mime' in this.config.url) ? this.config.url.mime : 'json';
-        if ((status > 199 && status < 300)) return await response[mimeType]();
-        return status;
-    }
-
-    /**
-     * Get a new access token from server
-     * @returns {Promise<Error|any>}
-     * @private
-     */
-    async _getNewAccessToken() {
-        if (!(this._validateURL() && 'refresh' in this.tokens)) throw new Error('[Auth Web] Trying to get a access token without mandatory keys.');
-        const {endpoints, keys} = this.config.url;
-        const response = await this._toServer({endpoint: endpoints.refresh, token: 'refresh'});
-        //TODO: Create max attempts when no internet connection
-        if (response instanceof Error) return response;
-        this.tokens.access = response[keys.access];
-        this._setup();
-        return response;
-    }
-
-    /**
-     * Create a function that check JWT expiration every 1 second
-     * @param [attempts] {number} - Attempts before set refresh JWT token like expired
-     * @private
-     */
-    _createChecker(attempts = 0) {
-        const handler = async () => {
-            const isExpired = this.checkExpiration('access');
-            if (isExpired && !('refresh' in this.tokens)) return this.expire();
-            window.clearInterval(this._interval);
-            const result = await this._getNewAccessToken();
-            if (!(result instanceof Error)) return;
-            if (typeof result === 'number' && this._checkStatus(result)) this.expire();
-            else this._createChecker(attempts += 1);
+    async set(access = '', refresh = '', remember) {
+        if (typeof remember === 'boolean') this.storage = remember ? 'localStorage' : 'sessionStorage';
+        const { accessToken = access, refreshToken = refresh } = this.constructor.getStorage(this.storage, this.keys);
+        if (!accessToken) return this.events.empty();
+        // Save expiration
+        try {
+            this._expirationAccessToken = this.constructor.getExpirationToken(accessToken);
+            if (refreshToken) this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
+        } catch (e) {
+            return this.events.error(e);
         }
-        const {maxAttempts = 3} = this.config;
-        this._interval = (attempts <= maxAttempts) ? window.setInterval(handler, 1000) : this.expire();
+        this.constructor.saveTokens(this.storage, this.keys, accessToken, refreshToken);
+
+        try {
+            await this.askServer();
+            return this.observer();
+        } catch (e) {
+            if (e !== 'undefined') return this.events.error(e);
+            this.events.expired('accessToken');
+            return this.renew();
+        }
     }
 
-    /**
-     * Validate exist all keys and types of keys are correct
-     * @returns {boolean}
-     * @private
-     */
-    _validateURL() {
-        return (typeof this.config === 'object'
-            && 'url' in this.config
-            && typeof this.config.url === 'object'
-            && 'endpoints' in this.config.url
-            && typeof this.config.url['endpoints'] === 'object'
-            && 'access' in this.config.url['endpoints']);
+    on(event = '', callback = () => {}) {
+        this.events[event] = callback;
     }
 
-    /**
-     * Generate body with refresh token to send to server
-     * @returns {Object} - Object with refresh token, not string.
-     * @private
-     */
-    _parseBodyKeys() {
-        const {refresh} = (this._validateURL()) ? this.config.bodies : {};
-        if (refresh) this.config.bodies.refresh[this.config.url.keys.refresh] = this.tokens.refresh;
-        return (this._validateURL()) ? this.config.bodies.refresh : {};
+    clean() {
+        // Remove from localStorage
+        window.localStorage.removeItem(this.keys.accessToken);
+        window.localStorage.removeItem(this.keys.refreshToken);
+        // Remove from sessionStorage
+        window.sessionStorage.removeItem(this.keys.accessToken);
+        window.sessionStorage.removeItem(this.keys.refreshToken);
     }
 
-    /**
-     * Check HTTP status code of request
-     * @param status {number} - HTTP status code
-     * @returns {boolean} - Check if the HTTP status code is as expected
-     * @private
-     */
-    _checkStatus(status) {
-        const DefaultStatus = (this._validateURL() && 'status' in this.config.url) && this.config.url.status;
-        return DefaultStatus === status;
+    observer(attempts = 1) {
+        if (this._stop || !this._expirationAccessToken) return;
+        const isAccessTokenExpired = new Date().getTime() > this._expirationAccessToken;
+        if (!isAccessTokenExpired) return setTimeout(() => this.observer(), 1000);
+        if (attempts < 2) this.events.expired('accessToken');
+        if (!this._expirationRefreshToken) return;
+        // Try to get new refreshToken
+        return this.renew(attempts);
     }
 
-    /**
-     * Fire update access token after renewal event
-     * @private
-     */
-    _updateAccessToken() {
-        if (this._validateURL() && 'updateToken' in this.config) this.config.updateToken();
+    async renew(attempts = 1) {
+        // Check refreshToken was not expired
+        const isRefreshTokenExpired = new Date().getTime() > this._expirationRefreshToken;
+        if (isRefreshTokenExpired) return this.events.expired('refreshToken');
+
+        const { refreshToken: config } = this.config.endpoints;
+        const { refreshToken } = this.constructor.getTokens(this.storage, this.keys);
+        try {
+            const { accessToken } = config.keys;
+            const response = await this.askServer('refreshToken');
+            this.constructor.saveTokens(this.storage, this.keys, response[accessToken], refreshToken);
+            this._expirationAccessToken = this.constructor.getExpirationToken(response[accessToken]);
+            this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
+            this.events.renewed();
+            return this.observer();
+        } catch (e) {
+            if (!e) return; // Only if was expired
+            if (attempts >= config.attempts) return this.events.error(e);
+            setTimeout(() => this.observer(attempts + 1), 1000 * (attempts + 1));
+        }
     }
-};
+
+    async askServer(tokenName = 'accessToken') {
+        if (this._stop) return;
+        const {url, body, headers, method, authorizationType, keys, status} = this.config.endpoints[tokenName];
+        // Create payload
+        const tokens = this.constructor.getTokens(this.storage, this.keys);
+        const xHeaders = Object.assign(headers, {Authorization: `${authorizationType} ${tokens[tokenName]}`});
+        const xBody = Object.assign(body, { [keys[tokenName]]: tokens[tokenName] });
+        // Send request
+        const fullURL = `${this.config.endpoints.hostname}${url}`;
+        const payload = { method, headers: xHeaders };
+        if (['post', 'patch', 'put'].includes(method.toLowerCase())) payload.body = JSON.stringify(xBody);
+        const response = await fetch(fullURL, payload);
+        if (response.status === status.ok) return response.json();
+        if (response.status !== status.expired && response instanceof Error) throw response;
+        // Clean store and fire expired event
+        this.clean();
+        throw this.events.expired(tokenName);
+    }
+
+    stop(value = true) {
+        this._stop = value;
+        this.clean();
+    }
+
+    static getTokens(storage = 'sessionStorage', keys = {}) {
+        const accessToken = window[storage].getItem(keys.accessToken);
+        const refreshToken = window[storage].getItem(keys.refreshToken);
+        return (accessToken || refreshToken) ? { accessToken, refreshToken } : {};
+    }
+
+    static saveTokens(storage = 'sessionStorage', keys = {}, accessToken = '', refreshToken = '') {
+        window[storage].setItem(keys.accessToken, accessToken);
+        window[storage].setItem(keys.refreshToken, refreshToken);
+    }
+
+    static getExpirationToken(JWT = '') {
+        const decoded = jwt(JWT);
+        if (typeof decoded !== 'object') throw new Error('Invalid JWT, please check.');
+        return ('exp' in decoded) ? decoded.exp * 1000 : Infinity;
+    }
+
+    static getStorage(key = '') {
+        return (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage';
+    }
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = WebAuth;
+}
+
+if (typeof define === 'function' && define.amd) {
+    define('WebAuth', [], function() {
+        return WebAuth;
+    });
+}

@@ -1,5 +1,20 @@
 # Changelog
 
+The versioning is based on a semantic version (semver).
+
+### v3.0.0 [Break change]
+
+**CAUTION**: this version will crash your current project, check [README](https://github.com/videsk/front-auth-handler#readme) to do changes correctly.
+
+This version is focused on security tokens handle and integration with request interceptors to force renew the access token if JWT could be invalid by others factors like blacklist. 
+
+- [NEW] Completely rebased
+- [NEW] Events expired, renewed, empty and error
+- [NEW] Force renew
+- [NEW] Mocha test
+- [NEW] Coverage test
+- [NEW] Examples
+
 ### v2.4.0
 
 - [FIX] Completely refactored (5Kb less)

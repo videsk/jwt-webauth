@@ -1,27 +1,24 @@
 # Front Authorization Handler
- A Javascript frontend authorization tokens manager/handler that works with JWT.
+
+A Javascript frontend authorization tokens handler that works with JWT to check expiration and token transactions with the server.
  
- This library allows you forget manage authorizations tokens, and instantiate an automatic way to manage JWT tokens in localStorage or sessionStorage and many more features.
- 
+Handle authorization tokens as sessions, based on `accessToken` and `refreshToken`, that will save it in local or session storage, and create an automatic renew when tokens expire and can integrate with request interceptors.
+
  ![license](https://camo.githubusercontent.com/76d5d2b7f6cb797adf6c30fafa4a2cb2f4390155/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f6d61746961736c6f70657a642f584465627567676572) ![size](https://img.shields.io/bundlephobia/min/@videsk/front-auth-handler) ![sizesrc](https://img.shields.io/github/size/videsk/front-auth-handler/index.js) ![issues](https://img.shields.io/github/issues-raw/videsk/front-auth-handler) ![rank](https://img.shields.io/librariesio/sourcerank/npm/@videsk/front-auth-handler) ![version](https://img.shields.io/npm/v/@videsk/front-auth-handler) ![downloads](https://img.shields.io/npm/dt/@videsk/front-auth-handler)
- 
-**IMPORTANT: If you not set backend validation, this library try "validate" JWT only checking format and expiration time of token. For secure validation of JWT you need the signature (backend).**
 
 ```
-From the version 2.0.0 code is totally rebased.
-If you use previous versions please check the new changes.
+Use the latest version! Previous version < 3.0.0 are insecure
+and has not been tested.
 ```
 
 ## Features
 
-* Automatically manage storage of tokens
-* Check and handle storage in every initialization
-* Automatically create a expiration checker
-* Backend HTTP tokens validation
-* Automatically get a new access token with a refresh token
-* Custom function for expiration
-
-Also you can access to all functions manually.
+* Automatic save tokens in session or local storage
+* Automatic storage for remember a session or not
+* Expiration observer
+* Server side validation
+* Automatically and manually renew the access token with the refresh token
+* Events for expiration, renewed, empty and errors
 
 ## Installation
 
@@ -31,156 +28,220 @@ From NPM
 
 Self hosted
 
-`<script src="/dist/web-auth.bundle.js"></script>`
+`<script src="/dist/web-auth.min.js"></script>`
  
 ## How to use
-For start you need instance `WebAuth` class.
+For start you need instance `WebAuth`.
 
 ```js
-const auth = new WebAuth({ keys: Object, tokens: Object, remember: Boolean, config: Object, expired: Function });
+const auth = new WebAuth(options);
 ```
 
+### Options
 
-The keys `keys`, `tokens`, `remember`, `config` and `expired` need the follow information:
+The class receive one argument as `object`. That object contains the following keys:
 
 ```js
-{
-    keys: {
-        access: String, // Name set in local or session storage, by default: "auth-key" [Optional]
-        refresh: String, // Name set in local or session storage, by default: "auth-key-refresh" [Optional]
-    },
-    tokens: {
-        access: String, //[Mandatory]
-        refresh: String, //[Optional]
-    },
-    remember: Boolean, // This tell to class if save in local or session storage, by default: false
-    config: { ... }, // See more info in "Validate JWT in backend" section
-    expired: () => {} // This function is executed during an active session and when access token expires and/or refresh token expires/invalidate. By default is a empty function [Optional]
-}
+const options = { keys, config };
 ```
 
-Now to instance the new manager need initialize.
+**keys**
+
+This key, have the "key name" that will store in local or session storage. By default, are `auth-key` and `auth-key-refresh`, for access and refresh token respectively.
+
 ```js
-auth.init().then((result) => {
-    // Here do something
-    console.log(result);
-    // Output: { valid: Boolean, tokens: Object, payloads: Object, pathname: Object }
-})
-.catch(() => {
-    // Is not valid
-    // Logout or anything you want
-})
+const keys = {
+    accessToken: 'auth-key',
+    refreshToken: 'auth-key-refresh'
+};
 ```
 
-The object in the result have a pathname key that have the follow information:
+**config**
+
+In case of config, this key has the major of configuration of WebAuth, so we recommend go to `index.js` [file](https://github.com/videsk/front-auth-handler/blob/master/index.js) and copy the default object.
+
+In previous versions, use server side validation was optional, now from version 3.0.0 is mandatory, so this decision was took by security concerns. Please not send PR or issue requesting that.
+
+### Start to handle
+
+After you pass the options that is optional (but you will work in `http://localhost:3000`, by default) can start to handle with the following code:
 
 ```js
-{
-    pathname: {
-        plain: 'https://app.domain.com/page/34234#example?name=example&number=555',
-        byLevels: [
-            { path: 'page', level: 0 },
-            { path: '34234', level: 1 }
-        ],
-        hash: 'example',
-        search: {
-            name: 'example',
-            number: '555' // All values will be in String!!After you can parse
-        }
-    }
-}
+// Set empty, auto handle existing saved tokens
+auth.set();
+// Set with accessToken only
+auth.set(accessToken);
+// Set with accessToken and refreshToken
+auth.set(accessToken, refreshToken);
+// Also can set if you want "remember session"
+auth.set(accessToken, refreshToken, true);
 ```
 
-## Check JWT when reload page
-For check when user reload app only you need is instance without token and `WebAuth` check automatically in localStorage and sessionStorage if exist valid JWT.
+This automatically start to observe the expiration of access and/or refresh token. Also check validity of access token by the server and when expire automatically will try to get a new one, only if you set a refresh token.
 
-**Not forget add `keys` and `config` if you have custom keys, backend validation and refresh token implementation.**
+### Force renew
+
+This property allows you to force renew the access token with the refresh token, so this is relevant when you integrate with interceptors. In case a request returns `401 Unauthorized` (typically token expire or blacklisted) you can force renew.
 
 ```js
-// No custom keys and config
-const auth = new WebAuth({});
-// With custom keys and config
-const auth = new WebAuth({ keys, config });
+auth.renew();
+```
 
-auth.init().then((result) => {
-    // Exist valid JWT
-    // Ex: Redirect to result.pathname
-})
-.catch(() => {
-    /// Not exist valid JWT
-    //  Ex: Redirect to login or refresh access token
+This is very useful not only when user do a request, seconds before the observer can check that access token was expired, also when access and/or refresh token was invalidated by the server in a blacklist by security reasons (ex. password reset).
+
+So, is important use it directly in your interceptors when you know that access token was expired, blacklisted or invalidated by the server.
+
+### Events
+
+WebAuth from version 3.0.0 was added events, can help to know when access and refresh token was expired, renewed or something not works.
+
+The available events are:
+
+```js
+const events = {
+    expired: () => {}, 
+    error: () => {}, 
+    renewed: () => {}, 
+    empty: () => {},
+};
+```
+
+To set them, you can do it with this elegant way:
+
+```js
+auth.on('name-event', callback);
+
+// Example
+auth.on('expired', function () {
+    // Do something
+});
+
+// Or less elegant
+auth.events.expired = () => {
+    // Do something
+};
+```
+Remember that both method will override the default empty function. So, define a callback per event only one time on your code.
+
+In case of `expired` event, returns the name of token was expired that will be `accessToken` or `refreshToken`. So, you can difference like this:
+
+```js
+auth.on('expired', function (tokenName) {
+    if (tokenName === 'accessToken') return; // Set function when not use refreshToken
+    // Is refreshToken
+    logoutUser();
 });
 ```
 
-### Validate JWT in backend
-This library not validate JWT only check expiration time and body of token. That mean is very ease change token with DevTools in sessionStorage or localStorage, for that reason we recommend set backend validation with this function.
 
-For validate in your backend only need set key `config` like object with the follow properties:
+### Stop and clean
+
+This two properties allows you to `clean` tokens from storage and `stop` the observer. The `stop` also clean the tokens, so use stop when you want to reactivate observer manually with `.set()`.
 
 ```js
-... = new WebAuth({
-    config: {
-        url: {
-            base: 'https://api.mydomain.com', // Never add '/' to the end
-            endpoints: {
-                // Check endpoint for check validity of access token
-                check: 'validate-access-token',
-                // Endpoint for get a new access token with refresh token
-                refresh: 'refresh-token' // Example
-            },
-            keys: {
-                access: String, // This is uses for access to object returned in HTTP request
-                refresh: String // This is uses for access to object returned in HTTP request
-            },
-            status: Number, // Status code when return an expired or invalid JWT (Mandatory if set backend validation)
-            contentType: String // Please read about MIME
-        },
-        // Authorization is added automatically.
-        // Use prefix for set type of authorization
-        headers: {
-            Origin: 'https://mydefault.com:80',
-        },
-        prefix: String, // Prefix of Authorization header. By default is 'Bearer'
-        // By default all are POST
-        methods: {
-            access: String, // Method for validate access token in backend
-            refresh: String // Method for validate refresh token in backend
-        },
-        // Here add custom body for access and refresh HTTP request
-        bodies: {
-            access: Object || String, // Optional, by default is empty object
-            refresh: Object || String, // Optional, by default is empty object
-        },
-        updateToken: Function, // Add your custom function
-    }
+// Only clean tokens
+auth.clean();
+// Stop all and clean tokens
+auth.stop();
+```
+
+We recommend to use `.stop()` when the user logout from the web app.
+
+### Server side validation
+
+When you start `WebAuth`, try to check validity to the endpoint, in case the server returns an expired response, `WebAuth` will try to get a new one with the refreshToken.
+
+In the `config` key, you will see that the two endpoints have `status` and `attempts`. These keys help to handle the response of the server, so in case of `status = { ok: 200, expired: 401 }` tells to `WebAuth` when the server returns a new one or validate correctly the accessToken. And in case of `attempts` in when the server returns other code that is not specified on the `status` and give the possibility to try again, also when the user does not have Internet connection.
+
+When `WebAuth` detects issues trying to get a response of the server, automatically start to try N times you set on `attempts`, as a number of intervals and factor. That means:
+
+```js
+setTimeout(() => recursive(attempts + 1), 1000 * attempts + 1);
+
+// Example with the 3 attempts by default
+
+// First attempt
+setTimeout(() => recursive(1), 1000);
+// Second attempt
+setTimeout(() => recursive(2), 2000);
+// Third attempt
+setTimeout(() => recursive(3), 3000);
+// ...
+
+// So in a period of 6 seconds WebAuth will try to get a ok or expired response from server with 3 attempts
+```
+
+In case exceed the attempts the event error will throw, and the tokens will remove from the session or local storage. That behavior is by security reasons, to avoid store tokens without server validation, so you can override calling to method `stop()`.
+
+This is really helpful when user lose connection, also in that cases you can complement with manually Internet connection check, so you can call `stop()` method to avoid `WebAuth` remove tokens. 
+
+## Lifecycle
+
+This is the lifecycle of `WebAuth`, when use accessToken and refreshToken.
+
+```shell
+    Instance WebAuth
+            ↓
+set(accessToken, refreshToken) → observer start → (if empty, no tokens) → fire empty()
+            ↓
+server side accessToken validate
+            ↓                           
+    (accessToken expire) → fire expire('accessToken')
+            ↓                       
+    renew automatically ⇿ (if fails) ← try renew x times → fire error(error)
+            ↓
+        save tokens → observer start → fire renewed()
+            ↓
+    refreshToken expire
+            ↓
+fire expired('refreshToken')
+            ↓
+  end (here request login)
+```
+
+If you don't use a refreshToken, the lifecycle will be like this:
+
+```shell
+    Instance WebAuth
+            ↓
+server side accessToken validate
+            ↓
+set(accessToken, refreshToken) → observer start → (if empty, no tokens) → fire empty()
+            ↓
+(accessToken expire) → fire expire('accessToken')
+            ↓
+           end
+```
+
+# Debugging
+
+We recommend to use event `error` to check all issues with server side validations. This library was tested so should not throw unhandled errors related to observer.
+
+```js
+// Development environment
+auth.on('error', function (error) {
+    debugger;
+    console.log(error);
+});
+
+// Production
+auth.on('error', function (error) {
+    // Here can integrate with error monitoring like Sentry
 });
 ```
 
-### Expiration time
-When you initialize WebAuth, automatically create a expiration checker with a `setInterval` that check expiration of access token **every 1 second**. If token expires will be executed `expired` function.
+We strongly recommend use `error` event with error monitoring like Sentry, Bugsnag, LogRocket, etc. The cases when error event should be fired are a malformed JWT and server error response.
 
-But if you set a `refresh token`, so WebAuth try to get a new `access token`. If the server return a error that match with `status` configured, it runs `expired` function, but if the server returns other different `status` error, WebAuth enter in a loop for try 5 times, before apply a delay of 5 seconds.
+# Testing
 
-This is designed for avoid crash app if the server is not available.
+This library was tested with `Mocha`, `chai` and `chai-http`. Also was created a polyfill of `window` to test with `localStorage` and `sessionStorage` in Node, [check here](https://github.com/videsk/window-node-polyfill).
 
-## Key schema
-Every initialization returns a object with:
-
-* `valid`: Boolean indicate if access token is valid
-* `tokens`: Object with the access and refresh tokens
-* `payloads`: Object with JWT payload of access and refresh tokens
-* `pathname`: Object with pathname in special format
-
-## Force to clean tokens
-If you need clean all tokens like log out, only need execute the follow code line.
-```js
-auth.cleanTokens();
-```
-
-# Issues
-
-If you want contribute go to [this repository](https://github.com/videsk/front-auth-handler).
+For coverage was used `nyc`.
 
 # Changelog
 
 See changelog [here](https://github.com/videsk/front-auth-handler/blob/master/CHANGELOG.MD).
+
+# License
+
+This library was developed by [Videsk](https://videsk.io) with ♥ license LGPL-2.1. 

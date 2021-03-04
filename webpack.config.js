@@ -5,7 +5,7 @@ module.exports = {
     entry: './index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'web-auth.bundle.js',
+        filename: 'web-auth.min.js',
         library: 'WebAuth',
         libraryTarget: 'umd'
     },
