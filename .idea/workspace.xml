@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="NEW:Add version">
+      <change afterPath="$PROJECT_DIR$/.eslintrc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -82,7 +86,9 @@
       <workItem from="1614788441040" duration="38829000" />
       <workItem from="1614882162525" duration="1947000" />
       <workItem from="1614907761828" duration="107000" />
-      <workItem from="1614908879591" duration="1826000" />
+      <workItem from="1614908879591" duration="1861000" />
+      <workItem from="1614911089871" duration="2501000" />
+      <workItem from="1614944934415" duration="1299000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -126,7 +132,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614910698541</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="NEW:Add version">
+      <created>1614910710057</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1614910710057</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

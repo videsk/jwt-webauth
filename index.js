@@ -1,4 +1,4 @@
-const jwt = require('jwt-decode');
+const { jwtDecode } = require('jwt-js-decode');
 const { version } = require('./package.json');
 
 class WebAuth {
@@ -219,9 +219,9 @@ class WebAuth {
      * @returns {number|number}
      */
     static getExpirationToken(JWT = '') {
-        const decoded = jwt(JWT);
+        const decoded = jwtDecode(JWT);
         if (typeof decoded !== 'object') throw new Error('Invalid JWT, please check.');
-        return ('exp' in decoded) ? decoded.exp * 1000 : Infinity;
+        return ('exp' in decoded.payload) ? decoded.payload.exp * 1000 : Infinity;
     }
 
     /**
@@ -234,12 +234,12 @@ class WebAuth {
     }
 }
 
-if (typeof module !== 'undefined') {
-    module.exports = WebAuth;
-}
-
 if (typeof define === 'function' && define.amd) {
     define('WebAuth', [], function() {
         return WebAuth;
     });
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = WebAuth;
 }

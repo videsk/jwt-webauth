@@ -1,6 +1,6 @@
 {
   "name": "@videsk/front-auth-handler",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "A Javascript frontend authorization key handler for works with JWT.",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "homepage": "https://developers.videsk.io",
   "license": "LGPL-2.1",
   "dependencies": {
-    "jwt-decode": "^3.1.2"
+    "jwt-js-decode": "^1.4.1"
   },
   "devDependencies": {
     "@videsk/window-node-polyfill": "^1.0.1",
