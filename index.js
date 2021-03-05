@@ -77,8 +77,8 @@ class WebAuth {
         if (!accessToken) return this.events.empty();
         // Save expiration
         try {
-            this._expirationAccessToken = this.constructor.getExpirationToken(accessToken, this.constructor.decodeJWT);
-            if (refreshToken) this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken, this.constructor.decodeJWT);
+            this._expirationAccessToken = this.constructor.getExpirationToken(accessToken);
+            if (refreshToken) this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
         } catch (e) {
             return this.events.error(e);
         }
@@ -144,8 +144,8 @@ class WebAuth {
             const { accessToken } = config.keys;
             const response = await this.askServer('refreshToken');
             this.constructor.saveTokens(this.storage, this.keys, response[accessToken], refreshToken);
-            this._expirationAccessToken = this.constructor.getExpirationToken(response[accessToken], this.constructor.decodeJWT);
-            this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken, this.constructor.decodeJWT);
+            this._expirationAccessToken = this.constructor.getExpirationToken(response[accessToken]);
+            this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
             this.events.renewed();
             return this.observer();
         } catch (e) {
@@ -218,10 +218,10 @@ class WebAuth {
      * @param decoder {Function} - JWT decoder
      * @returns {number|number}
      */
-    static getExpirationToken(JWT = '', decoder) {
-        const decoded = decoder(JWT);
+    static getExpirationToken(JWT = '') {
+        const decoded = JSON.parse(atob(JWT.split('.')[1]));
         if (typeof decoded !== 'object') throw new Error('Invalid JWT, please check.');
-        return ('exp' in decoded.payload) ? decoded.payload.exp * 1000 : Infinity;
+        return ('exp' in decoded) ? decoded.exp * 1000 : Infinity;
     }
 
     /**
@@ -231,10 +231,6 @@ class WebAuth {
      */
     static getStorage(key = '') {
         return (window.localStorage.getItem(key)) ? 'localStorage' : 'sessionStorage';
-    }
-
-    static decodeJWT(JWT = '') {
-        return JSON.parse(atob(JWT.split('.')[1]));
     }
 }
 

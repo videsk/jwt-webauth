@@ -2,6 +2,10 @@
 
 The versioning is based on a semantic version (semver).
 
+### v.3.0.6
+
+- [FIX] Stable version
+
 ### v3.0.0 [Break change]
 
 **CAUTION**: this version will crash your current project, check [README](https://github.com/videsk/front-auth-handler#readme) to do changes correctly.
