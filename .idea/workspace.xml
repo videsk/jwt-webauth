@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Remove JWT library dependecy">
+    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Stable version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/web-auth.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +102,7 @@
       <workItem from="1614907761828" duration="107000" />
       <workItem from="1614908879591" duration="1861000" />
       <workItem from="1614911089871" duration="2501000" />
-      <workItem from="1614944934415" duration="4456000" />
+      <workItem from="1614944934415" duration="4564000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -173,7 +167,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614952862767</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="FIX:Stable version">
+      <created>1614953652778</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1614953652778</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,7 +200,8 @@
     <MESSAGE value="NEW:Add version" />
     <MESSAGE value="FIX:Replace JWT library" />
     <MESSAGE value="FIX:Remove JWT library dependecy" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX:Remove JWT library dependecy" />
+    <MESSAGE value="FIX:Stable version" />
+    <option name="LAST_COMMIT_MESSAGE" value="FIX:Stable version" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

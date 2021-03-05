@@ -215,7 +215,6 @@ class WebAuth {
     /**
      * Get expiration of JWT
      * @param JWT {String} - Valid JWT
-     * @param decoder {Function} - JWT decoder
      * @returns {number|number}
      */
     static getExpirationToken(JWT = '') {
