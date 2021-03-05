@@ -1,4 +1,5 @@
 const jwt = require('jwt-decode');
+const { version } = require('./package.json');
 
 class WebAuth {
 
@@ -61,6 +62,7 @@ class WebAuth {
         this._expirationAccessToken = null;
         this._expirationRefreshToken = null;
         this._stop = false;
+        this.version = version;
     }
 
     /**
