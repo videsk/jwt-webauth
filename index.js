@@ -65,14 +65,14 @@ class WebAuth {
 
     /**
      * Set WebAuth and start observer
-     * @param access {String} - accessToken
-     * @param refresh {String} - refreshToken
-     * @param remember {Boolean} - Save in session or local storage
+     * @param access {String=} - accessToken
+     * @param refresh {String=} - refreshToken
+     * @param remember {Boolean=} - Save in session or local storage
      * @returns {Promise<*|undefined>}
      */
     async set(access = '', refresh = '', remember) {
         if (typeof remember === 'boolean') this.storage = remember ? 'localStorage' : 'sessionStorage';
-        const { accessToken = access, refreshToken = refresh } = this.constructor.getStorage(this.storage, this.keys);
+        const { accessToken = access, refreshToken = refresh } = this.constructor.getTokens(this.storage, this.keys);
         if (!accessToken) return this.events.empty();
         // Save expiration
         try {
