@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Stable version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +106,10 @@
       <workItem from="1614907761828" duration="107000" />
       <workItem from="1614908879591" duration="1861000" />
       <workItem from="1614911089871" duration="2501000" />
-      <workItem from="1614944934415" duration="4564000" />
+      <workItem from="1614944934415" duration="4647000" />
+      <workItem from="1614954198334" duration="90000" />
+      <workItem from="1614963328150" duration="18000" />
+      <workItem from="1614964127612" duration="1043000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -174,7 +181,21 @@
       <option name="project" value="LOCAL" />
       <updated>1614953652778</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="FIX:Stable version">
+      <created>1614953795178</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1614953795178</updated>
+    </task>
+    <task id="LOCAL-00012" summary="FIX:Stable version">
+      <created>1614953800111</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1614953800111</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

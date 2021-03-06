@@ -54,6 +54,7 @@ class WebAuth {
             error: () => {},
             renewed: () => {},
             empty: () => {},
+            load: () => {},
         };
         this.config = config;
         this.storage = (window.localStorage.getItem(this.keys.accessToken)) ? 'localStorage' : 'sessionStorage';
@@ -86,6 +87,7 @@ class WebAuth {
 
         try {
             await this.askServer();
+            this.events.load();
             return this.observer();
         } catch (e) {
             if (e !== 'undefined') return this.events.error(e);
