@@ -103,6 +103,7 @@ const events = {
     error: () => {}, 
     renewed: () => {}, 
     empty: () => {},
+    load: () => {},
 };
 ```
 
@@ -133,6 +134,16 @@ auth.on('expired', function (tokenName) {
 });
 ```
 
+The `load` events is useful to set in the base of HTML or template app to know when the accessToken is valid or was renewed. Example:
+
+```js
+auth.on('load', function() {
+    // The accessToken and/or refreshToken are valid
+    // Or accessToken is expired, WebAuth will try to renew, then if the renovation is successful the event will be triggered
+});
+```
+
+So, is recommended to add the `load` event to the base of the app. With that, you can ensure that `load` event will be triggered only if accessToken and/or refreshToken are been valid. Inclusive if was valid from the first time the app was loaded or need to be renewed. Both cases ensure that the app can load with valid accessToken.
 
 ### Stop and clean
 

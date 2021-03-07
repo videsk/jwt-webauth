@@ -42,6 +42,27 @@ app.get("/login", function (req, res) {
   });
 });
 
+app.get("/login-expired", function (req, res) {
+  // Create JWT
+  const accessToken = jwt.sign(
+      { iat: Math.floor(new Date().getTime() / 1000) },
+      jwtOptionsAccessToken.secret,
+      { expiresIn: 1 }
+  );
+  const refreshToken = jwt.sign(
+      { iat: Math.floor(new Date().getTime() / 1000) },
+      jwtOptionsRefreshToken.secret,
+      { expiresIn: jwtOptionsRefreshToken.expiresIn }
+  );
+  // Set response have JSON format
+  res.header("Content-Type", "application/json");
+  // Send response
+  res.json({
+    accessToken,
+    refreshToken
+  });
+});
+
 app.get("/check-token", function (req, res) {
   try {
     const {token: accessToken} = authorization.parse(req.header('Authorization'));

@@ -2,6 +2,10 @@
 
 The versioning is based on a semantic version (semver).
 
+### v3.1.1
+
+- [FIX] Change lifecycle load event
+
 ### v3.1.0
 
 - [NEW] Load event

@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Stable version">
+    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="NEW:Added new load event">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/web-auth.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +56,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Mocha.test/web-auth.test.js">
+  <component name="RunManager" selected="Mocha.Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired">
     <configuration name="Test WebAuth.Login and set accessToken and refreshToken, then check is in sessionStorage" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
       <node-interpreter>project</node-interpreter>
       <node-options />
@@ -67,6 +70,22 @@
       <test-names>
         <name value="Test WebAuth" />
         <name value="Login and set accessToken and refreshToken, then check is in sessionStorage" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>TEST</test-kind>
+      <test-file>$PROJECT_DIR$/test/web-auth.test.js</test-file>
+      <test-names>
+        <name value="Test WebAuth" />
+        <name value="Login, set accessToken and refreshToken, then wait to the load event when is expired" />
       </test-names>
       <method v="2" />
     </configuration>
@@ -85,6 +104,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Mocha.test/web-auth.test.js" />
+        <item itemvalue="Mocha.Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired" />
         <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, then check is in sessionStorage" />
       </list>
     </recent_temporary>
@@ -109,7 +129,8 @@
       <workItem from="1614944934415" duration="4647000" />
       <workItem from="1614954198334" duration="90000" />
       <workItem from="1614963328150" duration="18000" />
-      <workItem from="1614964127612" duration="1043000" />
+      <workItem from="1614964127612" duration="1109000" />
+      <workItem from="1615133345636" duration="5043000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -195,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614953800111</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="NEW:Added new load event">
+      <created>1615060561385</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1615060561385</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,7 +250,8 @@
     <MESSAGE value="FIX:Replace JWT library" />
     <MESSAGE value="FIX:Remove JWT library dependecy" />
     <MESSAGE value="FIX:Stable version" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX:Stable version" />
+    <MESSAGE value="NEW:Added new load event" />
+    <option name="LAST_COMMIT_MESSAGE" value="NEW:Added new load event" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

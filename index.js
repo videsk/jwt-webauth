@@ -63,6 +63,7 @@ class WebAuth {
         this._expirationRefreshToken = null;
         this._stop = false;
         this.version = version;
+        this._load = false;
     }
 
     /**
@@ -87,10 +88,9 @@ class WebAuth {
 
         try {
             await this.askServer();
-            this.events.load();
             return this.observer();
         } catch (e) {
-            if (e !== 'undefined') return this.events.error(e);
+            if (e instanceof Error) return this.events.error(e);
             this.events.expired('accessToken');
             return this.renew();
         }
@@ -124,6 +124,10 @@ class WebAuth {
     observer(attempts = 1) {
         if (this._stop || !this._expirationAccessToken) return;
         const isAccessTokenExpired = new Date().getTime() > this._expirationAccessToken;
+        if (!isAccessTokenExpired && !this._load) {
+            this._load = true;
+            this.events.load();
+        }
         if (!isAccessTokenExpired) return setTimeout(() => this.observer(), 1000);
         if (attempts < 2) this.events.expired('accessToken');
         if (!this._expirationRefreshToken) return;
@@ -151,7 +155,7 @@ class WebAuth {
             this.events.renewed();
             return this.observer();
         } catch (e) {
-            if (!e) return; // Only if was expired
+            if (!(e instanceof Error)) return; // Only if was expired
             if (attempts >= config.attempts) return this.events.error(e);
             setTimeout(() => this.observer(attempts + 1), 1000 * (attempts + 1));
         }
@@ -177,7 +181,6 @@ class WebAuth {
         if (response.status === status.ok) return response.json();
         if (response.status !== status.expired && response instanceof Error) throw response;
         // Clean store and fire expired event
-        this.clean();
         throw this.events.expired(tokenName);
     }
 

@@ -8,6 +8,8 @@ const { server } = require('./server');
 
 const WebAuth = require('../index');
 
+const wait = () => new Promise(resolve => setTimeout(resolve, 1500));
+
 
 describe('Test WebAuth', function () {
 
@@ -65,6 +67,33 @@ describe('Test WebAuth', function () {
         await auth.set(accessToken, refreshToken);
         auth.stop();
     });
+
+    it('Login, set accessToken and refreshToken, then wait to the load event', async function () {
+        const response = await chai.request('http://localhost:3000').get('/login');
+        const { accessToken, refreshToken } = response.body;
+        const auth = new WebAuth();
+        return new Promise(resolve => {
+            auth.on('load', function () {
+                auth.stop();
+                resolve();
+            });
+            auth.set(accessToken, refreshToken);
+        });
+    }).timeout(5000);
+
+    it('Login, set accessToken and refreshToken, then wait to the load event when is expired', async function () {
+        const response = await chai.request('http://localhost:3000').get('/login-expired');
+        const { accessToken, refreshToken } = response.body;
+        await wait();
+        const auth = new WebAuth();
+        return new Promise(resolve => {
+            auth.on('load', function () {
+                auth.stop();
+                resolve();
+            });
+            auth.set(accessToken, refreshToken);
+        });
+    }).timeout(5000);
 
     it('Login and set accessToken and refreshToken, then check is in sessionStorage', async function () {
         const response = await chai.request('http://localhost:3000').get('/login');
