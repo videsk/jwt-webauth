@@ -190,6 +190,7 @@ class WebAuth {
      */
     stop(value = true) {
         this._stop = value;
+        this._load = false;
         this.clean();
     }
 

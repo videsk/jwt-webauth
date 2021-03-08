@@ -4,13 +4,10 @@
     <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="NEW:Added new load event">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/web-auth.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,6 +128,7 @@
       <workItem from="1614963328150" duration="18000" />
       <workItem from="1614964127612" duration="1109000" />
       <workItem from="1615133345636" duration="5043000" />
+      <workItem from="1615165516888" duration="1135000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>

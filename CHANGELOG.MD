@@ -2,9 +2,13 @@
 
 The versioning is based on a semantic version (semver).
 
+### v3.1.2
+
+- [FIX] Added to `stop` method set initial state, `_load` property to false
+
 ### v3.1.1
 
-- [FIX] Change lifecycle load event
+- [FIX] Change lifecycle `load` event
 
 ### v3.1.0
 
