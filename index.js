@@ -74,6 +74,7 @@ class WebAuth {
      * @returns {Promise<*|undefined>}
      */
     async set(access = '', refresh = '', remember) {
+        this._stop = false;
         if (typeof remember === 'boolean') this.storage = remember ? 'localStorage' : 'sessionStorage';
         const { accessToken = access, refreshToken = refresh } = this.constructor.getTokens(this.storage, this.keys);
         if (!accessToken) return this.events.empty();
@@ -178,8 +179,8 @@ class WebAuth {
         const payload = { method, headers: xHeaders };
         if (['post', 'patch', 'put'].includes(method.toLowerCase())) payload.body = JSON.stringify(xBody);
         const response = await fetch(fullURL, payload);
-        if (response.status === status.ok) return response.json();
-        if (response.status !== status.expired && response instanceof Error) throw response;
+        if (response.status === status.ok || (Array.isArray(status.ok) && status.ok.includes(response.status))) return response.json();
+        if (response.status !== status.expired && response instanceof Error || (Array.isArray(status.expired) && response.expired.includes(response.status))) throw response;
         // Clean store and fire expired event
         throw this.events.expired(tokenName);
     }

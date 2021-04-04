@@ -31,8 +31,8 @@ const options = {
                   refreshToken: 'refreshToken',
               }, 
               status: {           
-                  expired: 401, 
-                  ok: 200,
+                  expired: [401, 403], 
+                  ok: [200, 201],
               }, 
               attempts: 3
           }, 

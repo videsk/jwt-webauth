@@ -2,6 +2,14 @@
 
 The versioning is based on a semantic version (semver).
 
+### v3.2.1
+
+- [NEW] Fixed `_stop` key after execute `stop()` method.
+
+### v3.2.0
+
+- [NEW] HTTP code status can be number or array with numbers.
+
 ### v3.1.2
 
 - [FIX] Added to `stop` method set initial state, `_load` property to false
