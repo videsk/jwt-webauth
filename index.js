@@ -59,11 +59,12 @@ class WebAuth {
         this.config = config;
         this.storage = (window.localStorage.getItem(this.keys.accessToken)) ? 'localStorage' : 'sessionStorage';
 
-        this._expirationAccessToken = null;
-        this._expirationRefreshToken = null;
         this._stop = false;
         this.version = version;
         this._load = false;
+
+        // wrappers
+        this.stop = this.logout;
     }
 
     /**
@@ -78,13 +79,9 @@ class WebAuth {
         if (typeof remember === 'boolean') this.storage = remember ? 'localStorage' : 'sessionStorage';
         const { accessToken = access, refreshToken = refresh } = this.constructor.getTokens(this.storage, this.keys);
         if (!accessToken) return this.events.empty();
-        // Save expiration
-        try {
-            this._expirationAccessToken = this.constructor.getExpirationToken(accessToken);
-            if (refreshToken) this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
-        } catch (e) {
-            return this.events.error(e);
-        }
+
+        this.verifyJWT(accessToken, 'accessToken');
+        if (refreshToken) this.verifyJWT(refreshToken, 'refreshToken');
         this.constructor.saveTokens(this.storage, this.keys, accessToken, refreshToken);
 
         try {
@@ -123,15 +120,16 @@ class WebAuth {
      * @returns {Promise<*|undefined>|NodeJS.Timeout|*}
      */
     observer(attempts = 1) {
-        if (this._stop || !this._expirationAccessToken) return;
-        const isAccessTokenExpired = new Date().getTime() > this._expirationAccessToken;
+        const { accessToken, refreshToken } = this.constructor.getTokens(this.storage, this.keys);
+        if (this._stop || !accessToken) return;
+        const isAccessTokenExpired = new Date().getTime() > this.constructor.getExpirationToken(accessToken);
         if (!isAccessTokenExpired && !this._load) {
             this._load = true;
             this.events.load();
         }
         if (!isAccessTokenExpired) return setTimeout(() => this.observer(), 1000);
         if (attempts < 2) this.events.expired('accessToken');
-        if (!this._expirationRefreshToken) return;
+        if (!refreshToken) return;
         // Try to get new refreshToken
         return this.renew(attempts);
     }
@@ -142,17 +140,15 @@ class WebAuth {
      */
     async renew(attempts = 1) {
         // Check refreshToken was not expired
-        const isRefreshTokenExpired = new Date().getTime() > this._expirationRefreshToken;
+        const refreshToken = this.constructor.getTokens(this.storage, this.keys, 'refreshToken');
+        const isRefreshTokenExpired = new Date().getTime() > this.constructor.getExpirationToken(refreshToken);
         if (isRefreshTokenExpired) return this.events.expired('refreshToken');
 
         const { refreshToken: config } = this.config.endpoints;
-        const { refreshToken } = this.constructor.getTokens(this.storage, this.keys);
         try {
             const { accessToken } = config.keys;
             const response = await this.askServer('refreshToken');
             this.constructor.saveTokens(this.storage, this.keys, response[accessToken], refreshToken);
-            this._expirationAccessToken = this.constructor.getExpirationToken(response[accessToken]);
-            this._expirationRefreshToken = this.constructor.getExpirationToken(refreshToken);
             this.events.renewed();
             return this.observer();
         } catch (e) {
@@ -189,21 +185,38 @@ class WebAuth {
      * Stop observer and clean tokens
      * @param value
      */
-    stop(value = true) {
+    logout(value = true) {
         this._stop = value;
         this._load = false;
         this.clean();
     }
 
     /**
+     * Verify JWT is valid
+     * @param JWT {String} - JWT
+     * @param name {String} - Name of token
+     */
+    verifyJWT(JWT = '', name = '') {
+        try {
+            JSON.parse(atob(JWT.split('.')[1]));
+        } catch (e) {
+            this.events.error(e);
+            throw new Error(`${name} is not valid JWT.`);
+        }
+    }
+
+    /**
+     *
      * Get tokens from storage
      * @param storage {String} - Session or local storage
      * @param keys {Object} - Key names of storage
-     * @returns {{accessToken: *, refreshToken: *}}
+     * @param token {String} - Name of key want returned
+     * @returns {string|{accessToken: string, refreshToken: string}}
      */
-    static getTokens(storage = 'sessionStorage', keys = {}) {
+    static getTokens(storage = 'sessionStorage', keys = {}, token = '') {
         const accessToken = window[storage].getItem(keys.accessToken);
         const refreshToken = window[storage].getItem(keys.refreshToken);
+        if (token) return token === 'accessToken' ? accessToken : refreshToken;
         return (accessToken || refreshToken) ? { accessToken, refreshToken } : {};
     }
 

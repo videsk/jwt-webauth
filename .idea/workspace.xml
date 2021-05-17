@@ -3,13 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Initial state _load in stop method">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EXAMPLES.md" beforeDir="false" afterPath="$PROJECT_DIR$/EXAMPLES.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/web-auth.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +29,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="javascript.nodejs.core.library.configured.version" value="15.8.0" />
-    <property name="javascript.nodejs.core.library.typings.version" value="14.14.31" />
+    <property name="javascript.nodejs.core.library.typings.version" value="15.3.0" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -55,7 +54,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Mocha.Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired">
+  <component name="RunManager" selected="Mocha.test/web-auth.test.js">
     <configuration name="Test WebAuth.Login and set accessToken and refreshToken, then check is in sessionStorage" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
       <node-interpreter>project</node-interpreter>
       <node-options />
@@ -140,6 +139,7 @@
       <workItem from="1617483091830" duration="49000" />
       <workItem from="1617483339973" duration="300000" />
       <workItem from="1617494811838" duration="665000" />
+      <workItem from="1621277293333" duration="8206000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
