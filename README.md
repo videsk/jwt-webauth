@@ -1,4 +1,4 @@
-# Front Authorization Handler
+# JWT WebAuth
 
 A Javascript frontend authorization tokens handler that works with JWT to check expiration and token transactions with the server.
  
