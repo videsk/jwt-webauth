@@ -118,6 +118,19 @@ describe('Test WebAuth', function () {
         });
     });
 
+    it('Login, set accessToken and refreshToken, then clean storage', async function () {
+        const response = await chai.request(hostname).get('/login');
+        const { accessToken, refreshToken } = response.body;
+        const auth = new WebAuth(randomKeys());
+        auth.on('verify', () => true);
+        await auth.set(accessToken, refreshToken);
+        auth.logout();
+        chai.expect(window.localStorage.getItem(auth.keys.accessToken)).to.be.equal(undefined);
+        chai.expect(window.sessionStorage.getItem(auth.keys.accessToken)).to.be.equal(undefined);
+        chai.expect(window.localStorage.getItem(auth.keys.refreshToken)).to.be.equal(undefined);
+        chai.expect(window.sessionStorage.getItem(auth.keys.refreshToken)).to.be.equal(undefined);
+    });
+
     it('Login and set accessToken and refreshToken, then check is in sessionStorage', async function () {
         const response = await chai.request(hostname).get('/login');
         const { accessToken, refreshToken } = response.body;
