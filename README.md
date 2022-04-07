@@ -4,11 +4,11 @@ A Javascript frontend authorization tokens handler that works with JWT to check 
  
 Handle authorization tokens as sessions, based on `accessToken` and `refreshToken`, that will save it in local or session storage, and create an automatic renew when tokens expire and can integrate with request interceptors.
 
- ![license](https://camo.githubusercontent.com/76d5d2b7f6cb797adf6c30fafa4a2cb2f4390155/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f6d61746961736c6f70657a642f584465627567676572) ![size](https://img.shields.io/bundlephobia/min/@videsk/front-auth-handler) ![sizesrc](https://img.shields.io/github/size/videsk/front-auth-handler/index.js) ![issues](https://img.shields.io/github/issues-raw/videsk/front-auth-handler) ![rank](https://img.shields.io/librariesio/sourcerank/npm/@videsk/front-auth-handler) ![version](https://img.shields.io/npm/v/@videsk/front-auth-handler) ![downloads](https://img.shields.io/npm/dt/@videsk/front-auth-handler) [![DeepScan grade](https://deepscan.io/api/teams/7725/projects/9797/branches/130453/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=7725&pid=9797&bid=130453)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/77b2345715c0e444b9bf/test_coverage)](https://codeclimate.com/github/videsk/jwt-webauth/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/77b2345715c0e444b9bf/maintainability)](https://codeclimate.com/github/videsk/jwt-webauth/maintainability) ![license](https://camo.githubusercontent.com/76d5d2b7f6cb797adf6c30fafa4a2cb2f4390155/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f6d61746961736c6f70657a642f584465627567676572) ![size](https://img.shields.io/bundlephobia/min/@videsk/jwt-webauth) ![sizesrc](https://img.shields.io/github/size/videsk/jwt-webauth/index.js) ![issues](https://img.shields.io/github/issues-raw/videsk/jwt-webauth) ![rank](https://img.shields.io/librariesio/sourcerank/npm/@videsk/jwt-webauth) ![version](https://img.shields.io/npm/v/@videsk/jwt-webauth) ![downloads](https://img.shields.io/npm/dt/@videsk/jwt-webauth) [![DeepScan grade](https://deepscan.io/api/teams/7725/projects/20720/branches/573138/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=7725&pid=20720&bid=573138)
 
 ```
-Use the latest version! Previous version < 3.0.0 are insecure
-and has not been tested.
+BREAK CHANGE!
+We release new version with the name jwt-webauth, previous version is deprecated.
 ```
 
 ## Features
@@ -16,22 +16,23 @@ and has not been tested.
 * Automatic save tokens in session or local storage
 * Automatic storage for remember a session or not
 * Expiration observer
-* Server side validation
+* Server-side validation
 * Automatically and manually renew the access token with the refresh token
 * Events for expiration, renewed, empty and errors
+* Compatibility with native fetch API or any HTTP library
 
 ## Installation
 
 From NPM
 
-`npm i @videsk/front-auth-handler`
+`npm i @videsk/jwt-webauth`
 
-Self hosted
+Self-hosted
 
-`<script src="/dist/web-auth.min.js"></script>`
+`<script src="/dist/jwt-webauth.min.js"></script>`
  
 ## How to use
-For start you need instance `WebAuth`.
+For start, you need instance `WebAuth`.
 
 ```js
 const auth = new WebAuth(options);
@@ -42,10 +43,10 @@ const auth = new WebAuth(options);
 The class receive one argument as `object`. That object contains the following keys:
 
 ```js
-const options = { keys, config };
+const { keys, events, attempts, delay } = options;
 ```
 
-**keys**
+**keys** (optional)
 
 This key, have the "key name" that will store in local or session storage. By default, are `auth-key` and `auth-key-refresh`, for access and refresh token respectively.
 
@@ -56,15 +57,19 @@ const keys = {
 };
 ```
 
-**config**
+**events** (optional)
 
-In case of config, this key has the major of configuration of WebAuth, so we recommend go to `index.js` [file](https://github.com/videsk/front-auth-handler/blob/master/index.js) and copy the default object.
+Set event callbacks by `object`
 
-In previous versions, use server side validation was optional, now from version 3.0.0 is mandatory, so this decision was took by security concerns. Please not send PR or issue requesting that.
+**attempts** (optional)
 
-### Start to handle
+Number of attempts before throw error.
 
-After you pass the options that is optional (but you will work in `http://localhost:3000`, by default) can start to handle with the following code:
+**delay**
+
+Minutes to subtract to JWT expiration to consider is expired. Example: 5 min before expire to force renew.
+
+## Init
 
 ```js
 // Set empty, auto handle existing saved tokens
@@ -93,17 +98,23 @@ So, is important use it directly in your interceptors when you know that access 
 
 ### Events
 
-WebAuth from version 3.0.0 was added events, can help to know when access and refresh token was expired, renewed or something not works.
+WebAuth require as mandatory a few events for `verify` and `renew` access token.
 
-The available events are:
+The mandatory event is `verify` to check server-side validation. If is not present will throw an error.
+
+In case you can to use refresh token needs to set the `renew` event. Otherwise, if refresh token is present will throw an error.
+
+**Read more about server-side validation in the next section.**
+
+The other available events are:
 
 ```js
 const events = {
-    expired: () => {}, 
-    error: () => {}, 
-    renewed: () => {}, 
+    expired: () => {},
+    error: () => {},
+    renewed: () => {},
     empty: () => {},
-    load: () => {},
+    ready: () => {},
 };
 ```
 
@@ -134,57 +145,55 @@ auth.on('expired', function (tokenName) {
 });
 ```
 
-The `load` events is useful to set in the base of HTML or template app to know when the accessToken is valid or was renewed. Example:
+The `ready` events is useful to set in the base of HTML or template app to know when the accessToken is valid or was renewed. Example:
 
 ```js
-auth.on('load', function() {
+auth.on('ready', function() {
     // The accessToken and/or refreshToken are valid
     // Or accessToken is expired, WebAuth will try to renew, then if the renovation is successful the event will be triggered
 });
 ```
 
-So, is recommended to add the `load` event to the base of the app. With that, you can ensure that `load` event will be triggered only if accessToken and/or refreshToken are been valid. Inclusive if was valid from the first time the app was loaded or need to be renewed. Both cases ensure that the app can load with valid accessToken.
+So, is recommended to add the `ready` event to the base of the app. With that, you can ensure that `ready` event will be triggered only if accessToken and/or refreshToken are being valid. Inclusive if was valid from the first time the app was loaded or need to be renewed. Both cases ensure that the app can load with valid accessToken.
 
 ### Stop and clean
 
-This two properties allows you to `clean` tokens from storage and `stop` the observer. The `stop` also clean the tokens, so use stop when you want to reactivate observer manually with `.set()`.
+This two properties allows you to `clean` tokens from storage and `logout` the observer. The `logout` also clean the tokens, so use stop when you want to reactivate observer manually with `.set()`.
 
 ```js
 // Only clean tokens
 auth.clean();
 // Stop all and clean tokens
-auth.stop();
+auth.logout();
 ```
 
-We recommend to use `.stop()` when the user logout from the web app.
+We recommend to use `.logout()` when the user logout from the web app.
 
 ### Server side validation
 
-When you start `WebAuth`, try to check validity to the endpoint, in case the server returns an expired response, `WebAuth` will try to get a new one with the refreshToken.
+When you start `WebAuth`, will try to check validity executing `verify` event, in case the event return false will be considered as expired otherwise is valid. `WebAuth` will try to get a new access token, executing the `renew` event only if refresh token is present.
 
-In the `config` key, you will see that the two endpoints have `status` and `attempts`. These keys help to handle the response of the server, so in case of `status = { ok: 200, expired: 401 }` tells to `WebAuth` when the server returns a new one or validate correctly the accessToken. And in case of `attempts` in when the server returns other code that is not specified on the `status` and give the possibility to try again, also when the user does not have Internet connection.
-
-When `WebAuth` detects issues trying to get a response of the server, automatically start to try N times you set on `attempts`, as a number of intervals and factor. That means:
+If `renew` throw an error, `WebAuth` will try the number of attempts to set on `options`, which by default is 3.
 
 ```js
-setTimeout(() => recursive(attempts + 1), 1000 * attempts + 1);
+const auth = new WebAuth();
 
-// Example with the 3 attempts by default
+auth.on('verify', async () => {
+    const response = await fetch('.../verify');
+    const output = await response.json();
+    return output.isValid;
+});
 
-// First attempt
-setTimeout(() => recursive(1), 1000);
-// Second attempt
-setTimeout(() => recursive(2), 2000);
-// Third attempt
-setTimeout(() => recursive(3), 3000);
-// ...
-
-// So in a period of 6 seconds WebAuth will try to get a ok or expired response from server with 3 attempts
+auth.on('renew', async () => {
+    const response = await fetch('.../renew');
+    const output = await response.json();
+    return output.accessToken;
+});
 ```
 
-In case exceed the attempts the event error will throw, and the tokens will remove from the session or local storage. That behavior is by security reasons, to avoid store tokens without server validation, so you can override calling to method `stop()`.
+In case exceed the attempts, the event error will throw, and the tokens will remove from the session or local storage. That behavior is by security reasons, to avoid store tokens without server validation.
 
-This is really helpful when user lose connection, also in that cases you can complement with manually Internet connection check, so you can call `stop()` method to avoid `WebAuth` remove tokens. 
+This is really helpful when user lose connection, also in that cases you can complement with manually Internet connection check, so you can call `logout()` method to avoid `WebAuth` remove tokens. 
 
 ## Lifecycle
 
@@ -195,11 +204,11 @@ This is the lifecycle of `WebAuth`, when use accessToken and refreshToken.
             ↓
 set(accessToken, refreshToken) → observer start → (if empty, no tokens) → fire empty()
             ↓
-server side accessToken validate
+    fire verify event
             ↓                           
     (accessToken expire) → fire expire('accessToken')
             ↓                       
-    renew automatically ⇿ (if fails) ← try renew x times → fire error(error)
+    fire renew event ⇿ (if fails) ← try renew x times → fire error(error)
             ↓
         save tokens → observer start → fire renewed()
             ↓
@@ -207,7 +216,7 @@ server side accessToken validate
             ↓
 fire expired('refreshToken')
             ↓
-  end (here request login)
+  end (here request login) → fire logout event
 ```
 
 If you don't use a refreshToken, the lifecycle will be like this:
@@ -215,13 +224,13 @@ If you don't use a refreshToken, the lifecycle will be like this:
 ```shell
     Instance WebAuth
             ↓
-server side accessToken validate
+    fire verify event
             ↓
 set(accessToken, refreshToken) → observer start → (if empty, no tokens) → fire empty()
             ↓
 (accessToken expire) → fire expire('accessToken')
             ↓
-           end
+           end → fire logout evet
 ```
 
 # Debugging
@@ -248,10 +257,6 @@ We strongly recommend use `error` event with error monitoring like Sentry, Bugsn
 This library was tested with `Mocha`, `chai` and `chai-http`. Also was created a polyfill of `window` to test with `localStorage` and `sessionStorage` in Node, [check here](https://github.com/videsk/window-node-polyfill).
 
 For coverage was used `nyc`.
-
-# Changelog
-
-See changelog [here](https://github.com/videsk/front-auth-handler/blob/master/CHANGELOG.MD).
 
 # License
 

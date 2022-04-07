@@ -1,47 +1,58 @@
 {
-  "name": "@videsk/front-auth-handler",
-  "version": "3.2.2",
-  "description": "A Javascript frontend authorization key handler for works with JWT.",
-  "main": "index.js",
+  "name": "@videsk/jwt-webauth",
+  "version": "1.0.0",
+  "description": "Auto manage JWT access and refresh token like a session, with server-side validation and renew.",
+  "umdName": "WebAuth",
+  "browser": "dist/jwt-webauth.min.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "webpack",
-    "start-server": "node ./test/server.js",
-    "test": "start-server-and-test start-server :8080 testing",
-    "testing": "cypress open"
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "mocha ./test/auth.test.js --exit",
+    "coverage:report": "./node_modules/nyc/bin/nyc.js --reporter=lcov --reporter=text mocha"
   },
   "keywords": [
     "authorization",
     "webauth",
     "JWT",
-    "key",
-    "frontend"
+    "key"
   ],
   "author": "videsk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videsk/front-auth-handler.git"
+    "url": "https://github.com/videsk/jwt-webauth.git"
   },
   "homepage": "https://developers.videsk.io",
   "license": "LGPL-2.1",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.3",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^4.0.0",
     "@videsk/window-node-polyfill": "^1.0.1",
     "atob": "^2.1.2",
     "auth-header": "^1.0.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-preset-es2015": "^6.24.1",
     "body-parser": "^1.19.0",
     "chai": "^4.3.3",
     "chai-http": "^4.3.0",
-    "cypress": "^6.6.0",
+    "codecov": "^3.8.3",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^8.3.0",
-    "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
-    "socket.io": "^3.1.2",
-    "start-server-and-test": "^1.12.0",
-    "webpack": "^4.39.1",
-    "webpack-cli": "^3.3.6"
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-terser": "^7.0.2",
+    "semantic-release": "^19.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
   }
 }
