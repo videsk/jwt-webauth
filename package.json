@@ -12,7 +12,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "mocha ./test/auth.test.js --exit"
+    "test": "mocha ./test/auth.test.js --exit",
+    "coverage:report": "./node_modules/nyc/bin/nyc.js --reporter=lcov --reporter=text mocha"
   },
   "keywords": [
     "authorization",
