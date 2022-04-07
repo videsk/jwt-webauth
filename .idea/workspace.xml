@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="chore: update node-fetch">
+    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="chore: remove node-fetch not need anymore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/auth.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -224,7 +224,7 @@
       <workItem from="1648303938442" duration="18647000" />
       <workItem from="1648524972884" duration="24494000" />
       <workItem from="1649105644392" duration="722000" />
-      <workItem from="1649107498906" duration="38132000" />
+      <workItem from="1649107498906" duration="38804000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -352,7 +352,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649304490565</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="chore: remove node-fetch not need anymore">
+      <created>1649304758965</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1649304758965</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -383,7 +390,8 @@
     <MESSAGE value="feat: new stable version" />
     <MESSAGE value="chore(coverage): install codecov and step name" />
     <MESSAGE value="chore: update node-fetch" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: update node-fetch" />
+    <MESSAGE value="chore: remove node-fetch not need anymore" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: remove node-fetch not need anymore" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

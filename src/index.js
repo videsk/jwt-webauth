@@ -84,7 +84,7 @@ class WebAuth {
         const expired = this.constructor.delayedDate(this.delay) > this.getExpiration(accessToken);
         this.debug('log', 'accessToken is expired?', expired);
         if (!expired) return setTimeout(this.observer.bind(this), 1000);
-        if (!refreshToken && expired) return this.fire('expired', 'accessToken');
+        if (!refreshToken) return this.fire('expired', 'accessToken');
         return this.renew(attempts);
     }
 
