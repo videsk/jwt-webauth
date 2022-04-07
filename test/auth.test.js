@@ -1,6 +1,5 @@
 require('@videsk/window-node-polyfill');
 global.window.atob = require('atob');
-global.fetch = require('node-fetch');
 const chai = require('chai'), chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
