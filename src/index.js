@@ -120,7 +120,7 @@ class WebAuth {
      */
     clean() {
         this.debug('log', 'Cleaning store...');
-        const keys = Object.keys(this.keys);
+        const keys = Object.values(this.keys);
         keys.forEach(key => {
             window.localStorage.removeItem(key);
             window.sessionStorage.removeItem(key);
