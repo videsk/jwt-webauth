@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="fix: remove unnecessary expired conditional">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/release.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/release.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/test.yml" afterDir="false" />
+    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="chore: fix branch name">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -225,7 +224,7 @@
       <workItem from="1648303938442" duration="18647000" />
       <workItem from="1648524972884" duration="24494000" />
       <workItem from="1649105644392" duration="722000" />
-      <workItem from="1649107498906" duration="39292000" />
+      <workItem from="1649107498906" duration="39640000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -367,7 +366,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649305770849</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="chore: fix branch name">
+      <created>1649306000267</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1649306000267</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -400,7 +406,8 @@
     <MESSAGE value="chore: update node-fetch" />
     <MESSAGE value="chore: remove node-fetch not need anymore" />
     <MESSAGE value="fix: remove unnecessary expired conditional" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unnecessary expired conditional" />
+    <MESSAGE value="chore: fix branch name" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: fix branch name" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
