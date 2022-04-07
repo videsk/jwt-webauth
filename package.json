@@ -52,7 +52,7 @@
   },
   "release": {
     "branches": [
-      "main"
+      "master"
     ]
   }
 }
