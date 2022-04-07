@@ -9,12 +9,12 @@ app.use(bodyParser.json());
 
 const jwtOptionsAccessToken = {
   secret: "b98U897b6r5567y89NM0m",
-  expiresIn: "3s"
+  expiresIn: "2s"
 };
 
 const jwtOptionsRefreshToken = {
   secret: "zny283en2837eze23e23e",
-  expiresIn: "10s"
+  expiresIn: "3s"
 };
 
 // Set node app trust in proxy

@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="FIX:Initial state _load in stop method">
+      <change afterPath="$PROJECT_DIR$/.babelrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/release.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/test.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rollup.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/auth.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.eslintrc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/web-auth.min.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.MD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EXAMPLES.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/web-auth.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/web-auth.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/web-auth.test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +36,17 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="1pAc0zFfdWAoW3qv5XCSdeCHYTQ" />
   <component name="ProjectViewState">
@@ -29,7 +59,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="javascript.nodejs.core.library.configured.version" value="15.8.0" />
-    <property name="javascript.nodejs.core.library.typings.version" value="15.3.0" />
+    <property name="javascript.nodejs.core.library.typings.version" value="15.14.9" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -40,22 +70,24 @@
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="nodejs_interpreter_path" value="$USER_HOME$/.nvm/versions/node/v15.8.0/bin/node" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/test/only-accessToken" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/test/empty" />
       <recent name="$PROJECT_DIR$/test" />
       <recent name="$PROJECT_DIR$/cypress/integration" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Mocha.test/web-auth.test.js">
-    <configuration name="Test WebAuth.Login and set accessToken and refreshToken, then check is in sessionStorage" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Mocha.test/auth.test.js">
+    <configuration name="Test WebAuth.Login and set accessToken and refreshToken, logout and check the store is empty" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
       <node-interpreter>project</node-interpreter>
       <node-options />
       <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
@@ -64,14 +96,14 @@
       <ui>bdd</ui>
       <extra-mocha-options />
       <test-kind>TEST</test-kind>
-      <test-file>$PROJECT_DIR$/test/web-auth.test.js</test-file>
+      <test-file>$PROJECT_DIR$/test/auth.test.js</test-file>
       <test-names>
         <name value="Test WebAuth" />
-        <name value="Login and set accessToken and refreshToken, then check is in sessionStorage" />
+        <name value="Login and set accessToken and refreshToken, logout and check the store is empty" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
+    <configuration name="Test WebAuth.Login and set accessToken and refreshToken, then wait to receive expired accessToken" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
       <node-interpreter>project</node-interpreter>
       <node-options />
       <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
@@ -80,11 +112,42 @@
       <ui>bdd</ui>
       <extra-mocha-options />
       <test-kind>TEST</test-kind>
-      <test-file>$PROJECT_DIR$/test/web-auth.test.js</test-file>
+      <test-file>$PROJECT_DIR$/test/auth.test.js</test-file>
       <test-names>
         <name value="Test WebAuth" />
-        <name value="Login, set accessToken and refreshToken, then wait to the load event when is expired" />
+        <name value="Login and set accessToken and refreshToken, then wait to receive expired accessToken" />
       </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Test WebAuth.Login and set accessToken only" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>TEST</test-kind>
+      <test-file>$PROJECT_DIR$/test/auth.test.js</test-file>
+      <test-names>
+        <name value="Test WebAuth" />
+        <name value="Login and set accessToken only" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="test/auth.test.js" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <envs>
+        <env name="DEBUG" value="true" />
+      </envs>
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>TEST_FILE</test-kind>
+      <test-file>$PROJECT_DIR$/test/auth.test.js</test-file>
       <method v="2" />
     </configuration>
     <configuration name="test/web-auth.test.js" type="mocha-javascript-test-runner" temporary="true" nameIsGenerated="true">
@@ -99,11 +162,20 @@
       <test-file>$PROJECT_DIR$/test/web-auth.test.js</test-file>
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Mocha.test/auth.test.js" />
+      <item itemvalue="Mocha.test/web-auth.test.js" />
+      <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, logout and check the store is empty" />
+      <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, then wait to receive expired accessToken" />
+      <item itemvalue="Mocha.Test WebAuth.Login and set accessToken only" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Mocha.test/auth.test.js" />
         <item itemvalue="Mocha.test/web-auth.test.js" />
-        <item itemvalue="Mocha.Test WebAuth.Login, set accessToken and refreshToken, then wait to the load event when is expired" />
-        <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, then check is in sessionStorage" />
+        <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, then wait to receive expired accessToken" />
+        <item itemvalue="Mocha.Test WebAuth.Login and set accessToken and refreshToken, logout and check the store is empty" />
+        <item itemvalue="Mocha.Test WebAuth.Login and set accessToken only" />
       </list>
     </recent_temporary>
   </component>
@@ -140,6 +212,10 @@
       <workItem from="1617483339973" duration="300000" />
       <workItem from="1617494811838" duration="665000" />
       <workItem from="1621277293333" duration="8206000" />
+      <workItem from="1648303938442" duration="18647000" />
+      <workItem from="1648524972884" duration="24494000" />
+      <workItem from="1649105644392" duration="722000" />
+      <workItem from="1649107498906" duration="37286000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -255,7 +331,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="NEW:v3.0.0" />
@@ -272,5 +347,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/jwt_webauth$test_auth_test_js.dat" NAME="test/auth.test.js Coverage Results" MODIFIED="1649294968720" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
