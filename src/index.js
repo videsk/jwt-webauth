@@ -160,8 +160,8 @@ class WebAuth {
      */
     getTokens(token) {
         const tokens = {
-            accessToken: window[this.storage].getItem(this.keys.accessToken),
-            refreshToken: window[this.storage].getItem(this.keys.refreshToken)
+            accessToken: window[this.storage].getItem(this.keys.accessToken) || undefined,
+            refreshToken: window[this.storage].getItem(this.keys.refreshToken) || undefined
         };
         this.debug('log', `Getting token from ${this.storage}`, tokens);
         return token ? tokens[token] : tokens;
