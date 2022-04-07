@@ -2,7 +2,7 @@ name: Release and publish
 on:
   workflow_run:
     workflows: ["Run Tests"]
-    branches: [ main ]
+    branches: [ master ]
     types:
       - completed
 
