@@ -7,13 +7,16 @@ const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
 
+const secretAccessToken = "b98U897b6r5567y89NM0m";
+const secretRefreshToken = "zny283en2837eze23e23e";
+
 const jwtOptionsAccessToken = {
-  secret: "b98U897b6r5567y89NM0m",
+  secret: secretAccessToken,
   expiresIn: "2s"
 };
 
 const jwtOptionsRefreshToken = {
-  secret: "zny283en2837eze23e23e",
+  secret: secretRefreshToken,
   expiresIn: "3s"
 };
 
@@ -108,4 +111,7 @@ module.exports = {
   jwtOptionsAccessToken,
   jwtOptionsRefreshToken,
   server,
+  secretAccessToken,
+  secretRefreshToken,
+  jwt,
 };
