@@ -3,7 +3,7 @@ global.window.atob = require('atob');
 const chai = require('chai'), chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-const { server } = require('./server');
+const { server, jwt, secretAccessToken, secretRefreshToken } = require('./server');
 
 const WebAuth = require('../src');
 
@@ -21,6 +21,17 @@ function checkStoreIsEmpty(key, key2) {
 function checkJWTExpire(auth, jwt) {
     const expired = auth.getExpiration(jwt);
     return expired < new Date().getTime();
+}
+
+function generateExpiredTokens(storageKeys, refresh = false, expiresAccessToken = '0.1s', expiresRefreshToken = '3s') {
+    const payload = { iat: Math.floor(new Date().getTime() / 1000) };
+    const accessToken = jwt.sign(payload, secretAccessToken, { expiresIn: expiresAccessToken });
+    const refreshToken = jwt.sign(payload, secretRefreshToken, { expiresIn: expiresRefreshToken });
+    window.localStorage.setItem(storageKeys.accessToken, accessToken);
+    window.sessionStorage.setItem(storageKeys.accessToken, accessToken);
+    if (refresh) window.localStorage.setItem(storageKeys.refreshToken, refreshToken);
+    if (refresh) window.sessionStorage.setItem(storageKeys.refreshToken, refreshToken);
+    return { accessToken, refreshToken };
 }
 
 const randomPort = Math.floor(Math.random() * (9999 - 3001)) + 3000;
@@ -231,6 +242,14 @@ describe('Test WebAuth', function () {
         const response = await chai.request(hostname).get('/login');
         const { accessToken, refreshToken } = response.body;
         const auth = new WebAuth(randomKeys());
+        auth.on('verify', async () => {
+            const response = await chai.request(hostname).get('/check-token');
+            return (response.statusCode !== 401);
+        });
+        auth.on('renew', async () => {
+            const { body } = await chai.request(hostname).get('/login');
+            return body.accessToken;
+        });
         return new Promise(async resolve => {
             auth.on('expired', (token) => {
                 if (token === 'accessToken') return;
@@ -248,8 +267,8 @@ describe('Test WebAuth', function () {
         const { accessToken, refreshToken } = response.body;
         const auth = new WebAuth(randomKeys());
         auth.on('verify', async () => {
-            const response = await chai.request(hostname).get('/check-token').catch(e => e);
-            return !(response instanceof Error);
+            const response = await chai.request(hostname).get('/check-token');
+            return (response.statusCode !== 401);
         });
         auth.on('renew', async () => {
             const { body } = await chai.request(hostname).get('/login');
@@ -315,8 +334,8 @@ describe('Test WebAuth', function () {
         const login1 = await login();
         const auth = new WebAuth(randomKeys());
         auth.on('verify', async () => {
-            const response = await chai.request(hostname).get('/check-token').catch(e => e);
-            return !(response instanceof Error);
+            const response = await chai.request(hostname).get('/check-token');
+            return (response.statusCode !== 401);
         });
         return new Promise(async (resolve) => {
             auth.on('expired', token => {
@@ -330,5 +349,59 @@ describe('Test WebAuth', function () {
             await auth.set(login1.accessToken, login1.refreshToken);
         });
     }).timeout(5000);
+
+    it('Init with expired accessToken on storage, expect expired', async function () {
+        const storageKeys = randomKeys();
+        const { accessToken } = generateExpiredTokens(storageKeys);
+        const auth = new WebAuth(storageKeys);
+        return new Promise(async resolve => {
+            auth.on('expired', async token => {
+                chai.expect(token).to.be.equal('accessToken');
+                resolve();
+            });
+            await wait(100);
+            return auth.set(accessToken, null);
+        });
+    });
+
+    it('Init with expired accessToken on storage, expect to be renewed', async function () {
+        const storageKeys = randomKeys();
+        const { accessToken, refreshToken } = generateExpiredTokens(storageKeys);
+        const auth = new WebAuth(storageKeys);
+        auth.on('renew', async () => {
+            const { body } = await chai.request(hostname).get('/login');
+            return body.accessToken;
+        });
+        return new Promise(async resolve => {
+            auth.on('renewed', () => {
+                auth.logout();
+                resolve();
+            });
+            await wait(100);
+            return auth.set(accessToken, refreshToken);
+        });
+    });
+
+    it('Login with expired accessToken and refreshToken on storage, expect ready', async function () {
+        const storageKeys = randomKeys();
+        const { accessToken, refreshToken } = generateExpiredTokens(storageKeys, true);
+        const auth = new WebAuth(storageKeys);
+        auth.on('renew', async () => {
+            const { body } = await chai.request(hostname).get('/login');
+            return body.accessToken;
+        });
+        auth.on('verify', async () => {
+            const response = await chai.request(hostname).get('/check-token');
+            return (response.statusCode !== 401);
+        });
+        return new Promise(async resolve => {
+            auth.on('ready', () => {
+                auth.logout();
+                resolve();
+            });
+            await wait(100);
+            return auth.login(accessToken, refreshToken);
+        });
+    });
 
 });

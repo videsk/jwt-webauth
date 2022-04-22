@@ -43,16 +43,27 @@ class WebAuth {
     }
 
     /**
+     * Login forcing new accessToken and refreshToken
+     * @param accessToken
+     * @param refreshToken
+     * @param remember
+     * @returns {Promise<String|undefined>}
+     */
+    login(accessToken, refreshToken, remember = false) {
+        return this.set(accessToken, refreshToken, remember, true);
+    }
+
+    /**
      * Set tokens
      * @param access {String} - Access token
      * @param refresh {String} - Refresh token
      * @param remember {Boolean} - Store in session or local storage
+     * @param forceNew {Boolean=} - Set if is login to drop older
      * @returns {Promise<String|undefined>}
      */
-    async set(access = '', refresh = '', remember = false) {
-        this.running = true;
+    async set(access = '', refresh = '', remember = false, forceNew = false) {
         this.storage = remember ? 'localStorage' : 'sessionStorage';
-        const { accessToken = access, refreshToken = refresh } = this.getTokens();
+        const { accessToken = access, refreshToken = refresh } = !forceNew ? this.getTokens() : { accessToken: access, refreshToken: refresh };
         this.debug('log', 'Initializing WebAuth with tokens', accessToken, refreshToken);
         if (!accessToken) return this.fire('empty', accessToken);
         const tokens = [accessToken];
@@ -63,7 +74,10 @@ class WebAuth {
             const isValid = await this.fire('verify', accessToken, refreshToken, this.events.expired, this.events.error);
             this.debug('info', 'The verification of accessToken is', isValid);
             if (!isValid && !refreshToken) return this.fire('expired', 'accessToken');
-            if (isValid) this.fire('ready');
+            if (isValid) {
+                this.running = true;
+                this.fire('ready');
+            }
             return isValid ? this.observer() : this.renew();
         } catch (error) {
             this.debug('error', 'Error trying to verifying accessToken.', error);
@@ -106,6 +120,10 @@ class WebAuth {
             this.debug('info', 'accessToken has renewed', newAccessToken);
             this.setToken('accessToken', newAccessToken);
             this.fire('renewed');
+            if (!this.running) {
+                this.running = true;
+                this.fire('ready');
+            }
             return this.observer();
         } catch (error) {
             this.debug('error', 'Error trying to renew accessToken', error);
