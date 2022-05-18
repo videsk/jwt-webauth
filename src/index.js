@@ -50,6 +50,7 @@ class WebAuth {
      * @returns {Promise<String|undefined>}
      */
     login(accessToken, refreshToken, remember = false) {
+        this.storage = remember ? 'localStorage' : 'sessionStorage';
         return this.set(accessToken, refreshToken, remember, true);
     }
 
@@ -62,7 +63,6 @@ class WebAuth {
      * @returns {Promise<String|undefined>}
      */
     async set(access = '', refresh = '', remember = false, forceNew = false) {
-        this.storage = remember ? 'localStorage' : 'sessionStorage';
         const { accessToken = access, refreshToken = refresh } = !forceNew ? this.getTokens() : { accessToken: access, refreshToken: refresh };
         this.debug('log', 'Initializing WebAuth with tokens', accessToken, refreshToken);
         if (!accessToken) return this.fire('empty', accessToken);
