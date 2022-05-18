@@ -8,7 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/auth.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -233,7 +232,9 @@
       <workItem from="1649107498906" duration="40359000" />
       <workItem from="1649344354475" duration="393000" />
       <workItem from="1649357562165" duration="339000" />
-      <workItem from="1650477477921" duration="11027000" />
+      <workItem from="1650477477921" duration="11159000" />
+      <workItem from="1650650704822" duration="2085000" />
+      <workItem from="1652833416088" duration="1319000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -403,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649357895413</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="feat: new login method&#10;&#10;Previously if exist expired tokens on storage conflict with the new access and refresh token, so was added login method where force use new tokens and discard older">
+      <created>1650590876456</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1650590876456</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -159,7 +159,7 @@ describe('Test WebAuth', function () {
         const auth = new WebAuth(randomKeys());
         const { accessToken: keyAccess, refreshToken: keyRefresh } = auth.keys;
         auth.on('verify', () => true);
-        await auth.set(accessToken, refreshToken, true);
+        await auth.login(accessToken, refreshToken, true);
         chai.expect(window.localStorage.getItem(keyAccess)).to.be.equal(accessToken);
         chai.expect(window.localStorage.getItem(keyRefresh)).to.be.equal(refreshToken);
     });
@@ -176,7 +176,7 @@ describe('Test WebAuth', function () {
                 chai.expect(checkStoreIsEmpty(key, key2)).to.be.equal(true);
                 resolve();
             });
-            await auth.set(accessToken, refreshToken);
+            await auth.login(accessToken, refreshToken);
             auth.logout();
         });
     });
@@ -188,7 +188,7 @@ describe('Test WebAuth', function () {
         auth.on('verify', () => true);
         return new Promise(resolve => {
             auth.on('ready', resolve);
-            auth.set(accessToken, refreshToken);
+            auth.login(accessToken, refreshToken);
         });
     });
 
@@ -200,7 +200,7 @@ describe('Test WebAuth', function () {
         return new Promise(async resolve => {
             await wait();
             auth.on('ready', resolve);
-            return auth.set(accessToken, refreshToken);
+            return auth.login(accessToken, refreshToken);
         });
     }).timeout(5000);
 
@@ -217,7 +217,7 @@ describe('Test WebAuth', function () {
                 auth.logout();
                 resolve();
             });
-            await auth.set(accessToken, refreshToken);
+            await auth.login(accessToken, refreshToken);
         });
     }).timeout(10000);
 
@@ -234,7 +234,7 @@ describe('Test WebAuth', function () {
                 auth.logout();
                 resolve();
             });
-            await auth.set(accessToken, refreshToken);
+            await auth.login(accessToken, refreshToken);
         });
     }).timeout(5000);
 
@@ -258,7 +258,7 @@ describe('Test WebAuth', function () {
                 auth.logout();
                 resolve();
             });
-            await auth.set(accessToken, refreshToken);
+            await auth.login(accessToken, refreshToken);
         });
     }).timeout(15000);
 
@@ -279,7 +279,7 @@ describe('Test WebAuth', function () {
                 auth.logout();
                 resolve();
             });
-            await auth.set(accessToken, refreshToken);
+            await auth.login(accessToken, refreshToken);
             await auth.renew();
         });
     });
@@ -302,7 +302,7 @@ describe('Test WebAuth', function () {
             await wait(3000);
             const login2 = await login();
             auth.on('ready', resolve);
-            await auth.set(login2.accessToken, login2.refreshToken);
+            await auth.login(login2.accessToken, login2.refreshToken);
         });
     }).timeout(5000);
 
