@@ -1,11 +1,13 @@
-require('@videsk/window-node-polyfill');
-global.window.atob = require('atob');
-const chai = require('chai'), chaiHttp = require('chai-http');
+import('@videsk/window-node-polyfill');
+import atob from 'atob';
+import chai, {expect} from 'chai';
+import chaiHttp from 'chai-http';
+
+global.window.atob = atob;
 chai.use(chaiHttp);
 
-const { server, jwt, secretAccessToken, secretRefreshToken } = require('./server');
-
-const WebAuth = require('../src');
+import { server, jwt, secretAccessToken, secretRefreshToken } from './server';
+import AuthSession from '../src';
 
 const wait = (timeout = 1500) => new Promise(resolve => setTimeout(resolve, timeout));
 
@@ -40,6 +42,11 @@ const events = ['renew', 'verify', 'expired', 'renewed', 'ready', 'empty', 'logo
 
 if (process.env.DEBUG) window.localStorage.setItem('debug', '*');
 
+function resetStorage() {
+    window.localStorage.store = {};
+    window.sessionStorage.store = {};
+}
+
 describe('Test WebAuth', function () {
 
     before(function(done) {
@@ -52,58 +59,93 @@ describe('Test WebAuth', function () {
         done();
     });
 
-    it('Initialize without options', function () {
-        new WebAuth(randomKeys());
+    beforeEach(function () {
+       resetStorage();
     });
 
-    it('Set event', function () {
-        const auth = new WebAuth(randomKeys());
-        auth.on('empty', () => {});
-        chai.expect(auth.events.empty).to.be.a('function');
-    });
-
-    it('Set events', function (done) {
-        const auth = new WebAuth(randomKeys());
-        events.forEach(event => {
-            auth.on(event, 'test');
-            chai.expect(auth.events[event]).to.be.equal('test');
-        });
+    it('Initialize without options', function (done) {
+        new AuthSession();
         done();
     });
 
-    it('Empty set', function (done) {
-        const auth = new WebAuth(randomKeys());
-        auth.on('empty', done);
-        auth.set();
+    it('Get default options', function (done) {
+        const { accessTokenStorageKey, refreshTokenStorageKey, maxRetries, retryDelay } = AuthSession.options;
+        chai.expect(accessTokenStorageKey).to.be.equal('session-resources-token');
+        chai.expect(refreshTokenStorageKey).to.be.equal('session-token');
+        chai.expect(maxRetries).to.be.equal(3);
+        chai.expect(retryDelay).to.be.equal(500);
     });
 
-    it('Instance and logout', function () {
-        const auth = new WebAuth(randomKeys());
-        auth.set();
-        auth.logout();
-        chai.expect(auth.running).to.be.equal(false);
+    it('Get localStorage for persistent session', function () {
+        const session = new AuthSession(true);
+        chai.expect(session.storage).to.be.equal('localStorage');
     });
 
-    it('Handle with manually observer init', function () {
-        const auth = new WebAuth(randomKeys());
-        return auth.observer();
+    it('Get sessionStorage for non persistent session', function () {
+        const session = new AuthSession();
+        chai.expect(session.storage).to.be.equal('sessionStorage');
     });
 
-    it('Got an error with invalid JWT', function () {
-        const auth = new WebAuth(randomKeys());
-        return new Promise(resolve => {
-            auth.on('error', resolve);
-            auth.set('invalidJWT', 'invalidJWT');
-        });
+    it('Get accessToken correctly', function () {
+        const session = new AuthSession();
+        window.sessionStorage.setItem(AuthSession.options.accessTokenStorageKey, 'my-access');
+        chai.expect(session.accessToken).to.be.equal('my-access');
     });
 
-    it('Start observer', async function () {
-        const response = await chai.request(hostname).get('/login');
-        const { accessToken } = response.body;
-        const auth = new WebAuth(randomKeys());
-        auth.on('verify', () => true);
-        return auth.set(accessToken);
+    it('Get refreshToken correctly', async function () {
+        const session = new AuthSession();
+        window.sessionStorage.setItem(AuthSession.options.refreshTokenStorageKey, 'my-refresh');
+        chai.expect(session.refreshToken).to.be.equal('my-refresh');
     });
+
+    it('Set accessToken', async function () {
+        const session = new AuthSession();
+        session.accessToken = 'my-access';
+        chai.expect(session.accessToken).to.be.equal('my-access');
+    });
+
+    it('Set refreshToken', async function () {
+        const session = new AuthSession();
+        session.refreshToken = 'my-refresh';
+        chai.expect(session.refreshToken).to.be.equal('my-refresh');
+    });
+
+    it('Throw an error when check without token', async function (done) {
+        try {
+            const session = new AuthSession();
+            return session.check();
+        } catch (error) {
+            done();
+        }
+    });
+
+    it('Check the accessToken is valid', async function () {
+        const session = new AuthSession();
+        const status = await session.check();
+        chai.expect(status).to.be.equal(true);
+    });
+
+    it('Check the accessToken is not valid', async function () {
+        const session = new AuthSession();
+        session.checker = Promise.reject;
+        const status = await session.check();
+        chai.expect(status).to.be.equal(false);
+    });
+
+    it('Renew the token without', async function (done) {
+        try {
+            const session = new AuthSession();
+            return session.renew();
+        } catch (error) {
+            done();
+        }
+    });
+
+    it('Renew the token without', async function () {
+        const session = new AuthSession();
+        return session.renew();
+    });
+
 
     it('Login and set accessToken only', async function () {
         const response = await chai.request(hostname).get('/login');

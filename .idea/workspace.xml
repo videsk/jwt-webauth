@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="feat: new login method&#10;&#10;Previously if exist expired tokens on storage conflict with the new access and refresh token, so was added login method where force use new tokens and discard older">
+    <list default="true" id="e8cd04de-59fb-497c-b478-dc83083e253f" name="Default Changelist" comment="fix(storage): initialization storage fixed&#10;&#10;Before this fix every time WebAuth was initialized the storage was set as sessionStorage. Now only change if calls the method login.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/auth.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/auth.test.js" afterDir="false" />
     </list>
@@ -59,31 +61,29 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="1pAc0zFfdWAoW3qv5XCSdeCHYTQ" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="javascript.nodejs.core.library.configured.version" value="15.8.0" />
-    <property name="javascript.nodejs.core.library.typings.version" value="15.14.9" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.path.for.package.eslint" value="project" />
-    <property name="node.js.path.for.package.tslint" value="project" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
-    <property name="nodejs_interpreter_path" value="$USER_HOME$/.nvm/versions/node/v15.8.0/bin/node" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/matias/projects/libraries/jwt-webauth&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -234,7 +234,14 @@
       <workItem from="1649357562165" duration="339000" />
       <workItem from="1650477477921" duration="11159000" />
       <workItem from="1650650704822" duration="2085000" />
-      <workItem from="1652833416088" duration="1319000" />
+      <workItem from="1652833416088" duration="1455000" />
+      <workItem from="1678410009395" duration="1620000" />
+      <workItem from="1707348383617" duration="12272000" />
+      <workItem from="1707366929105" duration="617000" />
+      <workItem from="1707420877432" duration="2525000" />
+      <workItem from="1707862660296" duration="673000" />
+      <workItem from="1708307885931" duration="308000" />
+      <workItem from="1708359585394" duration="600000" />
     </task>
     <task id="LOCAL-00001" summary="NEW:v3.0.0">
       <created>1614872764649</created>
@@ -411,7 +418,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650590876456</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="fix(storage): initialization storage fixed&#10;&#10;Before this fix every time WebAuth was initialized the storage was set as sessionStorage. Now only change if calls the method login.">
+      <created>1652834862202</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1652834862202</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -449,10 +463,11 @@
     <MESSAGE value="fix(storage): return undefined not null when get tokens" />
     <MESSAGE value="fix(clean): fixed key name for delete from storage" />
     <MESSAGE value="feat: new login method&#10;&#10;Previously if exist expired tokens on storage conflict with the new access and refresh token, so was added login method where force use new tokens and discard older" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: new login method&#10;&#10;Previously if exist expired tokens on storage conflict with the new access and refresh token, so was added login method where force use new tokens and discard older" />
+    <MESSAGE value="fix(storage): initialization storage fixed&#10;&#10;Before this fix every time WebAuth was initialized the storage was set as sessionStorage. Now only change if calls the method login." />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(storage): initialization storage fixed&#10;&#10;Before this fix every time WebAuth was initialized the storage was set as sessionStorage. Now only change if calls the method login." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
     <SUITE FILE_PATH="coverage/jwt_webauth$test_auth_test_js.dat" NAME="test/auth.test.js Coverage Results" MODIFIED="1649294968720" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/front_auth_handler$test_web_auth_test_js.dat" NAME="test/web-auth.test.js Coverage Results" MODIFIED="1614825109024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="MochaJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

@@ -1,264 +1,192 @@
-/**
- * Copyright (C) CURRENT_YEAR by Videsk - All Rights Reserved
- * @name LIBRARY_NAME
- * @author Videsk
- * @license LICENSE
- * Written by AUTHOR_LIBRARY
- *
- * DESCRIPTION_LIBRARY
- *
-*/
+import '@videsk/polyfill-event-target';
 
-class WebAuth {
-    /**
-     * Constructor WebAuth
-     * @param options {Object} - Options
-     * @param options.keys {Object} - Keys name for store in local or session storage
-     * @param options.events {Object} - Events
-     * @param options.attempts {Number} - Attempts before throw event
-     * @param options.delay {Number} - Delay to match JWT expiration
-     */
-    constructor(options = {}) {
-        const { keys, events = {}, attempts = 3, delay = 0 } = options;
-        this.keys = this.constructor.getKeys(keys);
-        this.events = Object.assign({}, events);
-        this.storage = this.constructor.getStorage(this.keys.accessToken);
-        this.attempts = attempts;
-        this.delay = delay;
-        this.version = 'VERSION';
-        this.log = this.constructor.debugFromStorage();
-        this.running = false;
-        this.debug = this.log ? this.constructor.debugWrapper : () => {};
-    }
+class AuthSession extends EventTarget {
 
-    /**
-     * Set event
-     * @param name {String} - Name of event
-     * @param callback {Function} - Callback will be executed
-     * @returns {WebAuth}
-     */
-    on(name, callback) {
-        this.events[name] = callback;
-        return this;
-    }
+  /**
+   * Initializes a new instance of the constructor.
+   *
+   * @param {boolean} [persistent=false] - The flag indicating whether the session should be persistent.
+   *
+   * @return {void}
+   */
+  constructor(persistent = false) {
+    super();
+    this.options = this.constructor.options;
+    this.persistent = persistent;
+    this.checkerService = Promise.resolve;
+    this.renewalService = Promise.resolve;
+    this.addEventListener('token:expired', this.renew.bind(this));
+  }
 
-    /**
-     * Login forcing new accessToken and refreshToken
-     * @param accessToken
-     * @param refreshToken
-     * @param remember
-     * @returns {Promise<String|undefined>}
-     */
-    login(accessToken, refreshToken, remember = false) {
-        this.storage = remember ? 'localStorage' : 'sessionStorage';
-        return this.set(accessToken, refreshToken, remember, true);
-    }
+  /**
+   * Returns the storage type based on the value of the 'persistent' property.
+   * @returns {string} The storage type, either 'localStorage' or 'sessionStorage'.
+   */
+  get storage() {
+    return this.persistent ? 'localStorage' : 'sessionStorage';
+  }
 
-    /**
-     * Set tokens
-     * @param access {String} - Access token
-     * @param refresh {String} - Refresh token
-     * @param remember {Boolean} - Store in session or local storage
-     * @param forceNew {Boolean=} - Set if is login to drop older
-     * @returns {Promise<String|undefined>}
-     */
-    async set(access = '', refresh = '', remember = false, forceNew = false) {
-        const { accessToken = access, refreshToken = refresh } = !forceNew ? this.getTokens() : { accessToken: access, refreshToken: refresh };
-        this.debug('log', 'Initializing WebAuth with tokens', accessToken, refreshToken);
-        if (!accessToken) return this.fire('empty', accessToken);
-        const tokens = [accessToken];
-        if (refreshToken) tokens.push(refreshToken);
-        this.validate(tokens);
-        this.setToken({ accessToken, refreshToken });
-        try {
-            const isValid = await this.fire('verify', accessToken, refreshToken, this.events.expired, this.events.error);
-            this.debug('info', 'The verification of accessToken is', isValid);
-            if (!isValid && !refreshToken) return this.fire('expired', 'accessToken');
-            if (isValid) {
-                this.running = true;
-                this.fire('ready');
-            }
-            return isValid ? this.observer() : this.renew();
-        } catch (error) {
-            this.debug('error', 'Error trying to verifying accessToken.', error);
-            this.fire('expired', 'accessToken');
-            if (refreshToken) return this.renew();
-        }
-    }
+  /**
+   * Retrieves the access token from the specified storage.
+   * @returns {*} The access token.
+   */
+  get accessToken() {
+    return window[this.storage].getItem(this.options.accessTokenStorageKey);
+  }
 
-    /**
-     * Observe JWT expiration
-     * @param attempts {Number} - Number of attempts
-     * @returns {NodeJS.Timeout|undefined|Promise<String|undefined>|void}
-     */
-    observer(attempts = 1) {
-        this.debug('log', 'Observer running');
-        const { accessToken, refreshToken } = this.getTokens();
-        if (!this.running || !accessToken) return this.debug('warn', 'accessToken is expired or WebAuth is not running.');
-        const expired = this.constructor.delayedDate(this.delay) > this.getExpiration(accessToken);
-        this.debug('log', 'accessToken is expired?', expired);
-        if (!expired) return setTimeout(this.observer.bind(this), 1000);
-        if (!refreshToken) return this.fire('expired', 'accessToken');
-        return this.renew(attempts);
-    }
+  /**
+   * Sets the access token in the storage.
+   * @param {string} token The access token to be set
+   */
+  set accessToken(token) {
+    window[this.storage].setItem(this.options.accessTokenStorageKey, token);
+  }
 
-    /**
-     * Renew access token
-     * @param attempts {Number} - Number of attempts
-     * @returns {Promise<NodeJS.Timeout|String|undefined|*>}
-     */
-    async renew(attempts = 1) {
-        this.debug('log', 'Trying to renew accessToken with refreshToken');
-        if (attempts === 1) this.fire('expired', 'accessToken');
-        const { accessToken, refreshToken} = this.getTokens();
-        const expired = new Date().getTime() > this.getExpiration(refreshToken);
-        this.debug('log', 'refreshToken is expired?', expired);
-        if (expired) return this.fire('expired', 'refreshToken');
-        try {
-            const newAccessToken = await this.fire('renew', refreshToken, accessToken, this.events.expired, this.events.error);
-            if (!newAccessToken) throw new Error('Renewed accessToken is empty, please check.');
-            this.debug('info', 'accessToken has renewed', newAccessToken);
-            this.setToken('accessToken', newAccessToken);
-            this.fire('renewed');
-            if (!this.running) {
-                this.running = true;
-                this.fire('ready');
-            }
-            return this.observer();
-        } catch (error) {
-            this.debug('error', 'Error trying to renew accessToken', error);
-            if (attempts >= this.attempts) return this.fire('error', error);
-            this.debug('log', `Re-trying to get a new accessToken for ${attempts}nd time.`);
-            setTimeout(this.observer.bind(this), 1000, attempts + 1);
-        }
-    }
+  /**
+   * Refreshes the access token by retrieving it from the storage.
+   * @returns {string} The refresh token stored in the storage.
+   */
+  get refreshToken() {
+    return window[this.storage].getItem(this.options.refreshTokenStorageKey);
+  }
 
-    /**
-     * Clean all tokens from storages
-     */
-    clean() {
-        this.debug('log', 'Cleaning store...');
-        const keys = Object.values(this.keys);
-        keys.forEach(key => {
-            window.localStorage.removeItem(key);
-            window.sessionStorage.removeItem(key);
-        });
-    }
+  /**
+   * Sets the refresh token in the storage.
+   * @param {string} token The refresh token.
+   */
+  set refreshToken(token) {
+    window[this.storage].setItem(this.options.refreshTokenStorageKey, token);
+  }
 
-    /**
-     * Logout and clean all
-     */
-    logout() {
-        this.debug('log', 'Login out...');
-        this.running = false;
-        this.clean();
-        this.fire('logout');
-    }
+  /**
+   * Returns the tokens for authentication.
+   * @returns {Object} The tokens object.
+   * @property {string} accessToken - The access token.
+   * @property {string} refreshToken - The refresh token.
+   */
+  get tokens() {
+    return { accessToken: this.accessToken, refreshToken: this.refreshToken };
+  }
 
-    /**
-     * Validate JWT
-     * @param jwt {String|[String]} - JWT
-     * @returns {*}
-     */
-    validate(jwt = '') {
-        this.debug('log', 'Validating JWT', jwt);
-        const verify = (token) => JSON.parse(window.atob(token.split('.')[1]));
-        try {
-            if (Array.isArray(jwt)) return jwt.some(token => !verify(token));
-            return verify(jwt);
-        } catch (error) {
-            throw this.fire('error', error);
-        }
-    }
+  /**
+   * Returns a function that can be used to check a value or a promise for a particular condition.
+   * The returned function can be called with either a value or a promise, and will return a promise
+   * that resolves to true if the condition is met, and false otherwise.
+   * @returns {Function|(() => Promise<void>)|(<T>(value: T) => Promise<Awaited<T>>)|(<T>(value: (PromiseLike<T> | T)) => Promise<Awaited<T>>)}
+   *          The checker function
+   */
+  get checker() {
+    return this.checkerService;
+  }
 
-    /**
-     * Get all token or by name
-     * @param token {"accessToken"|"refreshToken"=} - Name of token
-     * @returns {String|{accessToken: String, refreshToken: String}}
-     */
-    getTokens(token) {
-        const tokens = {
-            accessToken: window[this.storage].getItem(this.keys.accessToken) || undefined,
-            refreshToken: window[this.storage].getItem(this.keys.refreshToken) || undefined
-        };
-        this.debug('log', `Getting token from ${this.storage}`, tokens);
-        return token ? tokens[token] : tokens;
-    }
+  /**
+   * Setter method for the checker property.
+   * @param {Function|Promise} callback - The callback function or the promise to set as the checker.
+   *                                    If a function is provided, it will be used directly.
+   *                                    If a promise is provided, it will be resolved and the result will be used.
+   */
+  set checker(callback) {
+    this.checkerService = typeof callback === 'function' ? callback : Promise.resolve;
+  }
 
-    /**
-     * Store token in the storage
-     * @param key {String|Object} - Token name
-     * @param value {String} - Token value
-     */
-    setToken(key = '', value = '') {
-        if (typeof key === 'object') return Object.keys(key).forEach(name => this.setToken(name, key[name]));
-        this.debug('log', `Saving ${key} on ${this.storage} as ${this.keys[key]}`, value);
-        window[this.storage].setItem(this.keys[key], value);
-    }
+  /**
+   * Retrieves the renewal method.
+   * @returns {Function|(() => Promise<void>)|(<T>(value: T) => Promise<Awaited<T>>)|(<T>(value: (PromiseLike<T> | T)) => Promise<Awaited<T>>)}
+   *        The renewal method.
+   */
+  get renewal() {
+    return this.renewalService;
+  }
 
-    /**
-     * Get token expiration
-     * @param jwt {String} - JWT
-     * @returns {number}
-     */
-    getExpiration(jwt) {
-        this.debug('log', 'Getting expiration of JWT', jwt);
-        const decoded = this.validate(jwt);
-        if (typeof decoded !== 'object') throw this.fire('error', new Error('Invalid JWT'), decoded);
-        this.debug('log', 'JWT decoded', decoded);
-        return ('exp' in decoded) ? decoded.exp * 1000 : Infinity;
-    }
+  /**
+   * Sets the renewal callback function or promise.
+   * @param {function|Promise} callback - The callback function or promise to be executed for renewal.
+   */
+  set renewal(callback) {
+    this.renewalService = typeof callback === 'function' ? callback : Promise.resolve;
+  }
 
-    fire(eventName, ...args) {
-        this.debug('info', `Firing event ${eventName}`, ...args);
-        if (eventName in this.events) return this.events[eventName](...args);
-        if (eventName === 'verify' && !(eventName in this.events) && 'error' in this.events) throw this.events.error();
-        else if (eventName === 'verify' && !(eventName in this.events) && !('error' in this.events)) throw new Error('Provide a valid verification method.');
-    }
+  /**
+   * Checks if the access token is valid by invoking the checker service.
+   * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether the access token is valid.
+   * @throws {Error} If the access token is undefined.
+   */
+  async check() {
+    if (!this.accessToken) throw new Error('The access token is undefined');
+    const response = await this.checkerService(this.accessToken, this.refreshToken).catch(e => e);
+    if (response instanceof Error) this.expired();
+    return !(response instanceof Error);
+  }
 
-    /**
-     * Get keys name for storage
-     * @param keys
-     * @returns {{accessToken: (string|*), refreshToken: (string|*)}}
-     */
-    static getKeys(keys = {}) {
-        return { accessToken: keys.accessToken || 'auth-key', refreshToken: keys.refreshToken || 'auth-key-refresh' }
-    }
+  /**
+   * Renews the access token using the refresh token.
+   *
+   * @param {number} attempts - The number of attempts made to renew the token.
+   * @returns {Promise<NodeJS.Timeout|void>} - A promise that resolves to a timeout or void.
+   * @throws {Error} - Throws an error if the refresh token is undefined.
+   */
+  async renew(attempts = 0) {
+    if (!this.refreshToken) throw new Error('The refresh is undefined');
+    if (attempts >= this.options.maxRetries) return this.expired();
+    const accessToken = await this.renewalService(this.refreshToken, this.accessToken).catch(e => e);
+    if (accessToken instanceof Error) return setTimeout(this.renew.bind(this), this.options.retryDelay);
+    this.accessToken = accessToken;
+    this.dispatchEvent('token:renewed', { detail: this.tokens });
+  }
 
-    /**
-     * Get storage
-     * @param accessTokenKey {String} - Key on storage
-     * @returns {string}
-     */
-    static getStorage(accessTokenKey) {
-        return window.localStorage.getItem(accessTokenKey) ? 'localStorage' : 'sessionStorage';
-    }
+  /**
+   * Checks if the token has expired.
+   * @return {void}
+   */
+  expired() {
+    const canceled = !this.dispatchEvent('token:expired', { detail: this.tokens });
+    if (!canceled) this.purge();
+  }
 
-    /**
-     * Get date with minutes of delay
-     * @param minutes
-     * @returns {Date}
-     */
-    static delayedDate(minutes = 0) {
-        return new Date(new Date().setMinutes(new Date().getMinutes() - minutes));
-    }
+  /**
+   * Purges the session by removing the access and refresh tokens from storage and triggering the 'session:purged' event.
+   *
+   * @returns {void}
+   */
+  purge() {
+    window[this.storage].removeItem(this.options.accessTokenStorageKey);
+    window[this.storage].removeItem(this.options.refreshTokenStorageKey);
+    this.dispatchEvent('session:purged');
+  }
 
-    static debugWrapper(level = 'log', ...args) {
-        const colors = { log: 'gray', info: 'blue', warn: 'yellow', error: 'red' };
-        const style = `color: ${colors[level]};`;
-        return console.log('%cWebAuth', style, '>', ...args);
-    }
+  /**
+   * Dispatch a custom event
+   * @param eventName {String} Event name
+   * @param options {Object=} Options of the event
+   * @param options.detail {*} Details of event
+   * @param options.composed {Boolean=} Allow transfer the event outside shadow DOM
+   * @param options.bubbles {Boolean} Bubble the event through the DOM
+   * @param options.cancelable {Boolean} Enable cancel the event or not
+   * @returns {boolean}
+   */
+  dispatchEvent(eventName, options = {}) {
+    const event = new CustomEvent(eventName, Object.assign({ bubbles: true, composed: true, cancelable: true }, options));
+    return super.dispatchEvent(event);
+  }
 
-    /**
-     * Activate debug if is activated by storage
-     * @returns {boolean}
-     */
-    static debugFromStorage() {
-        const activators = ['webauth', '*'];
-        const value = window.localStorage.getItem('debug') || window.sessionStorage.getItem('debug') || '';
-        return activators.includes(value);
-    }
+  /**
+   * Retrieves the options for the method.
+   *
+   * @returns {Object} The options object containing the following properties:
+   *          - accessTokenStorageKey: The key used for storing the access token in storage.
+   *          - refreshTokenStorageKey: The key used for storing the refresh token in storage.
+   *          - maxRetries: The maximum number of retries allowed.
+   *          - retryDelay: The delay in milliseconds between retries.
+   */
+  static get options() {
+    return {
+      accessTokenStorageKey: 'session-resources-token',
+      refreshTokenStorageKey: 'session-token',
+      maxRetries: 3,
+      retryDelay: 500,
+    };
+  }
 
 }
 
-module.exports = WebAuth;
+export default AuthSession;
