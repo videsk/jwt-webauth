@@ -1,5 +1,6 @@
 {
   "name": "@videsk/jwt-webauth",
+  "type": "module",
   "version": "1.0.0",
   "description": "Auto manage JWT access and refresh token like a session, with server-side validation and renew.",
   "umdName": "WebAuth",
@@ -12,7 +13,9 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "mocha ./test/auth.test.js --exit",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
     "coverage:report": "./node_modules/nyc/bin/nyc.js --reporter=lcov --reporter=text mocha"
   },
   "keywords": [
@@ -33,7 +36,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@videsk/window-node-polyfill": "^1.0.1",
+    "@videsk/window-node-polyfill": "^1.0.0",
     "atob": "^2.1.2",
     "auth-header": "^1.0.0",
     "body-parser": "^1.20.2",
@@ -56,7 +59,8 @@
     ]
   },
   "dependencies": {
+    "@playwright/test": "^1.58.2",
     "@videsk/browser-debugger": "^1.1.1",
-    "@videsk/polyfill-event-target": "^1.0.1"
+    "@videsk/polyfill-event-target": "^1.0.2"
   }
 }

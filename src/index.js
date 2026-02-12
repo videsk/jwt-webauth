@@ -1,5 +1,3 @@
-import '@videsk/polyfill-event-target';
-
 class AuthSession extends EventTarget {
 
   /**
